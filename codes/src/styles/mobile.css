@@ -1,0 +1,183 @@
+/* 
+=========================================================
+  MOBILE CSS - BUILT FROM SCRATCH
+  This file handles the entire mobile responsive layout
+  for screens below 768px.
+=========================================================
+*/
+
+@media screen and (max-width: 768px) {
+  /* 1. Global Spacing & Typography */
+  .container {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  body, html {
+    overflow-x: hidden !important;
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 2.25rem !important;
+    line-height: 1.2 !important;
+  }
+
+  h2 {
+    font-size: 1.85rem !important;
+    line-height: 1.25 !important;
+  }
+
+  h3 {
+    font-size: 1.5rem !important;
+  }
+
+  p {
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+  }
+
+  section {
+    padding: 3rem 0 !important;
+  }
+
+  /* 2. Navigation Bar Mobile Adjustments */
+  nav, .navbar {
+    padding: 0.5rem 0 !important;
+  }
+  
+  .nav-container {
+    padding: 0 1rem !important;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .nav-container > div:first-child {
+    gap: 1rem !important; /* Reduce gap between logo and links */
+  }
+  
+  .navbar-brand-logo {
+    height: 32px !important; /* Smaller logo on mobile */
+  }
+
+  .nav-links {
+    display: none !important; /* Hide links on mobile public for now, or put in menu */
+  }
+
+  .nav-auth-desktop {
+    gap: 0.5rem !important;
+  }
+
+  .nav-auth-desktop .btn {
+    padding: 0.4rem 0.6rem !important;
+    font-size: 0.75rem !important;
+    width: auto !important;
+    white-space: nowrap !important;
+  }
+
+  /* 3. Hero Section Mobile Overrides */
+  .hero-section {
+    padding-top: 0.5rem !important;
+    padding-bottom: 1rem !important;
+    text-align: center;
+  }
+
+  .hero-banner-container {
+    border-radius: 8px !important;
+    height: auto !important;
+    aspect-ratio: 3008 / 1408 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  
+  .hero-banner-container img {
+    object-fit: cover !important;
+  }
+
+  /* 4. Form & Input Fields */
+  .form-group {
+    margin-bottom: 1rem !important;
+  }
+
+  .form-input {
+    padding: 0.6rem 0.8rem !important;
+    font-size: 1rem !important;
+  }
+
+  /* 5. Features Section (Landing Page) Mobile Overrides */
+  .feature-section {
+    padding: 4rem 0 !important;
+  }
+
+  .feature-flex {
+    display: flex !important;
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 2rem !important;
+  }
+
+  .feature-reverse {
+    flex-direction: column-reverse !important;
+  }
+
+  .feature-text-block {
+    width: 100% !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .feature-heading {
+    font-size: 2rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .feature-description {
+    font-size: 1.05rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .feature-image-block {
+    width: 100% !important;
+  }
+
+  .feature-image-block > div {
+    max-width: 100% !important;
+    border-radius: 16px !important;
+    aspect-ratio: 4/3 !important;
+  }
+
+  /* 6. Footer Mobile Overrides */
+  footer {
+    padding: 2.5rem 0 !important;
+    margin-top: 3rem !important;
+    text-align: center;
+  }
+
+  footer .container {
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  footer img {
+    margin: 0 auto 1rem auto !important;
+  }
+
+  footer a {
+    font-size: 0.85rem !important;
+  }
+  /* Carousel Controls Overrides */
+  .carousel-arrow { width: 28px !important; height: 28px !important; }
+  .carousel-arrow svg { width: 14px !important; height: 14px !important; }
+  .carousel-arrow-left { left: 10px !important; }
+  .carousel-arrow-right { right: 10px !important; }
+  .carousel-dots-container { bottom: 10px !important; padding: 4px 10px !important; gap: 6px !important; }
+  .carousel-dot { height: 6px !important; }
+  .carousel-dot[style*="width: 30px"] { width: 16px !important; }
+  .carousel-dot[style*="width: 8px"] { width: 6px !important; }
+}
+
+
