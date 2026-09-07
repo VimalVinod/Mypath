@@ -1,9 +1,29 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null;
+    // Usernames collection: used for unique handle reservation
+    match /usernames/{username} {
+      // Allow anyone to check if a username is available
+      allow read: if true;
+      // Allow authenticated user to claim a username for themselves
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      // Allow authenticated user to delete their own claimed username
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      // Disallow updating existing reservations
+      allow update: if false;
     }
+
+    // Users collection: user profiles
+    match /users/{userId} {
+      // Allow reading user documents for login checks and profile verification
+      allow read: if true;
+      // Allow users to create or update their own profile document
+      allow create, update: if request.auth != null && request.auth.uid == userId;
+      // Allow users to delete their own profile document
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Default catch-all rule
     match /{document=**} {
       allow read, write: if request.auth != null;
     }

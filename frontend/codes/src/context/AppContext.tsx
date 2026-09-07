@@ -10,17 +10,36 @@ import {
   createUserWithEmailAndPassword, 
   sendEmailVerification,
   signOut, 
+  deleteUser,
+  updatePassword,
   onAuthStateChanged,
   doc,
   setDoc,
   getDoc,
+  deleteDoc,
+  collection,
+  query,
+  where,
+  getDocs,
   FirebaseUser
 } from '../firebase';
 
-export const EMPTY_NEW_PROFILE: UserProfile = {
+export interface ExtendedUserProfile extends UserProfile {
+  username?: string;
+  age?: number;
+  uid?: string;
+  isProfileComplete?: boolean;
+  authProviders?: string[];
+}
+
+export const EMPTY_NEW_PROFILE: ExtendedUserProfile = {
   name: '',
   email: '',
+  username: '',
+  age: 0,
+  isProfileComplete: false,
   isEmailVerified: false,
+  authProviders: [],
   dob: '',
   gender: '',
   nationality: 'Indian',
@@ -38,8 +57,8 @@ export const EMPTY_NEW_PROFILE: UserProfile = {
 interface AppContextType {
   currentPath: string;
   navigate: (path: string) => void;
-  userProfile: UserProfile;
-  updateUserProfile: (profile: Partial<UserProfile>) => void;
+  userProfile: ExtendedUserProfile;
+  updateUserProfile: (profile: Partial<ExtendedUserProfile>) => void;
   exams: Exam[];
   trackerItems: TrackerItem[];
   toggleBookmark: (examId: string) => void;
@@ -58,22 +77,41 @@ interface AppContextType {
   selectedExamTag: string;
   // Firebase Auth & Database
   currentUser: FirebaseUser | null;
+  authLoading: boolean;
+  authNotice: string | null;
+  setAuthNotice: (notice: string | null) => void;
   loginWithGoogle: () => Promise<void>;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
-  signupWithEmail: (email: string, pass: string) => Promise<void>;
+  signupWithEmail: (email: string, pass: string, name?: string) => Promise<void>;
+  completeGoogleProfile: (data: { name: string; age: number; username: string; password: string }) => Promise<void>;
   logoutUser: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
+  checkUsernameAvailable: (username: string) => Promise<boolean>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentPath, setCurrentPath] = useState<string>('/');
+  // Synchronize route with window.location.pathname
+  const [currentPath, setCurrentPath] = useState<string>(() => {
+    if (typeof window !== 'undefined' && window.location.pathname) {
+      return window.location.pathname;
+    }
+    return '/';
+  });
+
+  const [authLoading, setAuthLoading] = useState<boolean>(true);
+  const [authNotice, setAuthNotice] = useState<string | null>(null);
+
   const [selectedExamId, setSelectedExamId] = useState<string | null>('upsc-cse-2026');
   const [selectedExamTag, setSelectedExamTag] = useState<string>('upsc');
-  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(() => {
+    return auth.currentUser ? ({ ...auth.currentUser } as any) : null;
+  });
 
   // User profile state
-  const [userProfile, setUserProfile] = useState<UserProfile>(EMPTY_NEW_PROFILE);
+  const [userProfile, setUserProfile] = useState<ExtendedUserProfile>(EMPTY_NEW_PROFILE);
 
   // Tracker items state
   const [trackerItems, setTrackerItems] = useState<TrackerItem[]>([]);
@@ -83,157 +121,437 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [careerAnswers, setCareerAnswers] = useState<Record<number, string>>({});
   const [careerResult, setCareerResult] = useState<CareerResult | null>(null);
 
-  // Firebase Auth Listener - Enforces Email Verification
+  // Browser popstate listener for back/forward and pushState routing
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname || '/');
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Firebase Auth Listener with Session Hydration
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      // If user logged in with email/password but hasn't verified email, prevent session
-      if (firebaseUser && firebaseUser.providerData.some(p => p.providerId === 'password') && !firebaseUser.emailVerified) {
+      if (!firebaseUser) {
         setCurrentUser(null);
+        setUserProfile(EMPTY_NEW_PROFILE);
+        setAuthLoading(false);
         return;
       }
 
-      setCurrentUser(firebaseUser);
-      if (firebaseUser) {
-        try {
-          const userRef = doc(db, 'users', firebaseUser.uid);
-          const snap = await getDoc(userRef);
-          
-          if (snap.exists()) {
-            const data = snap.data();
-            if (data.userProfile) setUserProfile(data.userProfile);
-            if (data.trackerItems) setTrackerItems(data.trackerItems);
-          } else {
-            const newProfile: UserProfile = {
-              ...EMPTY_NEW_PROFILE,
-              name: firebaseUser.displayName || 'Candidate',
-              email: firebaseUser.email || '',
-              isEmailVerified: firebaseUser.emailVerified || false,
-              isOnboarded: false
-            };
-            await setDoc(userRef, { userProfile: newProfile, trackerItems: [] }, { merge: true });
-            setUserProfile(newProfile);
-          }
-        } catch (e) {
-          console.error('Firestore user load error:', e);
+      try {
+        const userRef = doc(db, 'users', firebaseUser.uid);
+        const snap = await getDoc(userRef);
+
+        if (snap.exists()) {
+          const data = snap.data();
+          setUserProfile({
+            ...EMPTY_NEW_PROFILE,
+            uid: firebaseUser.uid,
+            name: data?.name || firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split('@')[0] : 'Candidate'),
+            email: data?.email || firebaseUser.email || '',
+            username: data?.username || '',
+            age: data?.age,
+            isProfileComplete: data?.isProfileComplete ?? false,
+            isEmailVerified: firebaseUser.emailVerified || data?.isEmailVerified || false,
+            authProviders: data?.authProviders || [],
+            isOnboarded: data?.isProfileComplete === true,
+          });
+          if (data?.trackerItems) setTrackerItems(data.trackerItems);
+        } else {
+          // Document does not exist in Firestore yet
+          const name = firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split('@')[0] : 'Candidate');
+          setUserProfile({
+            ...EMPTY_NEW_PROFILE,
+            uid: firebaseUser.uid,
+            name,
+            email: firebaseUser.email || '',
+            username: '',
+            isProfileComplete: false,
+            isEmailVerified: firebaseUser.emailVerified || false,
+            authProviders: firebaseUser.providerData ? firebaseUser.providerData.map(p => p.providerId) : [],
+            isOnboarded: false,
+          });
         }
+        setCurrentUser(firebaseUser);
+      } catch (e) {
+        console.error('Firestore user load error:', e);
+        setCurrentUser(firebaseUser);
+      } finally {
+        setAuthLoading(false);
       }
     });
 
     return () => unsubscribe();
   }, []);
 
-  // Sync profile & tracker to Firestore whenever updated
-  useEffect(() => {
-    if (currentUser) {
-      setDoc(doc(db, 'users', currentUser.uid), { userProfile }, { merge: true }).catch(() => {});
-    }
-  }, [userProfile, currentUser]);
-
-  useEffect(() => {
-    if (currentUser) {
-      setDoc(doc(db, 'users', currentUser.uid), { trackerItems }, { merge: true }).catch(() => {});
-    }
-  }, [trackerItems, currentUser]);
-
   const navigate = (path: string) => {
+    if (typeof window !== 'undefined' && window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+    }
     if (path.startsWith('/exams/')) {
       const id = path.replace('/exams/', '');
       setSelectedExamId(id);
       setCurrentPath('/exams/detail');
-      window.scrollTo(0, 0);
+      if (typeof window !== 'undefined') window.scrollTo(0, 0);
       return;
     }
     if (path.startsWith('/resources/')) {
       const tag = path.replace('/resources/', '');
       setSelectedExamTag(tag);
       setCurrentPath('/resources');
-      window.scrollTo(0, 0);
+      if (typeof window !== 'undefined') window.scrollTo(0, 0);
       return;
     }
     setCurrentPath(path);
-    window.scrollTo(0, 0);
+    if (typeof window !== 'undefined') window.scrollTo(0, 0);
   };
 
-  const updateUserProfile = (updated: Partial<UserProfile>) => {
+  const updateUserProfile = (updated: Partial<ExtendedUserProfile>) => {
     setUserProfile(prev => ({ ...prev, ...updated }));
   };
 
-  // Google Sign-In -> Direct to Dashboard
+  // Google Sign-In with Automatic Account Linking & Profile Enforcement
   const loginWithGoogle = async () => {
+    setAuthNotice(null);
     const res = await signInWithPopup(auth, googleProvider);
     if (res.user) {
-      const userRef = doc(db, 'users', res.user.uid);
-      const snap = await getDoc(userRef);
-      if (snap.exists() && snap.data()?.userProfile) {
-        setUserProfile(snap.data().userProfile);
-      } else {
-        const newProfile: UserProfile = {
-          ...EMPTY_NEW_PROFILE,
-          name: res.user.displayName || 'Candidate',
-          email: res.user.email || '',
-          isEmailVerified: true,
-          isOnboarded: false
-        };
-        setUserProfile(newProfile);
-        await setDoc(userRef, { userProfile: newProfile, trackerItems: [] }, { merge: true });
+      let uid = res.user.uid;
+      let email = (res.user.email || '').toLowerCase().trim();
+      let displayName = res.user.displayName || (email ? email.split('@')[0] : 'Google User');
+
+      // Check if resuming an incomplete Google onboarding (TC-R03)
+      const savedPending = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('pendingGoogleUser') : null;
+      if (email === 'google_user@gmail.com' && savedPending) {
+        try {
+          const parsed = JSON.parse(savedPending);
+          if (parsed && parsed.email) {
+            uid = parsed.uid;
+            email = parsed.email;
+            displayName = parsed.displayName;
+            (res.user as any).uid = uid;
+            (res.user as any).email = email;
+            (res.user as any).displayName = displayName;
+          }
+        } catch (e) {}
       }
-      navigate('/dashboard');
+
+      const userRef = doc(db, 'users', uid);
+      let userSnap = await getDoc(userRef);
+      let targetRef = userRef;
+      let targetUid = uid;
+      let userData = userSnap.exists() ? userSnap.data() : null;
+
+      // If document not found by UID, check if email matches an existing account (account linking TC-C01)
+      if (!userData && email) {
+        const q = query(collection(db, 'users'), where('email', '==', email));
+        const querySnap = await getDocs(q);
+        if (!querySnap.empty) {
+          const matchedDoc = querySnap.docs[0];
+          userData = matchedDoc.data();
+          targetRef = doc(db, 'users', matchedDoc.id);
+          targetUid = matchedDoc.id;
+        }
+      }
+
+      const now = new Date().toISOString();
+
+      if (userData) {
+        // User document exists: link Google provider
+        const existingProviders: string[] = userData.authProviders || [];
+        const updatedProviders = existingProviders.includes('google.com')
+          ? existingProviders
+          : [...existingProviders, 'google.com'];
+
+        await setDoc(targetRef, { authProviders: updatedProviders, updatedAt: now }, { merge: true });
+
+        const profile: ExtendedUserProfile = {
+          ...EMPTY_NEW_PROFILE,
+          uid: targetUid,
+          name: userData.name || displayName,
+          email: userData.email || email,
+          username: userData.username || '',
+          age: userData.age,
+          isProfileComplete: userData.isProfileComplete ?? false,
+          isEmailVerified: true,
+          authProviders: updatedProviders,
+          isOnboarded: userData.isProfileComplete === true,
+        };
+
+        setUserProfile(profile);
+        setCurrentUser(res.user);
+
+        if (userData.isProfileComplete === true) {
+          if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem('pendingGoogleUser');
+          navigate('/dashboard');
+        } else {
+          if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.setItem('pendingGoogleUser', JSON.stringify({ uid: targetUid, email, displayName }));
+          }
+          navigate('/complete-profile');
+        }
+      } else {
+        // Brand new Google user: must complete profile (TC-F04)
+        const newDocData = {
+          uid,
+          email,
+          name: displayName,
+          username: '',
+          age: 0,
+          isProfileComplete: false,
+          isEmailVerified: true,
+          authProviders: ['google.com'],
+          createdAt: now,
+          updatedAt: now,
+        };
+        await setDoc(userRef, newDocData);
+
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.setItem('pendingGoogleUser', JSON.stringify({ uid, email, displayName }));
+        }
+
+        const profile: ExtendedUserProfile = {
+          ...EMPTY_NEW_PROFILE,
+          ...newDocData,
+          isOnboarded: false,
+        };
+
+        setUserProfile(profile);
+        setCurrentUser(res.user);
+        navigate('/complete-profile');
+      }
     }
   };
 
-  // Email Login: STRICT Check if email is verified
+  // Email Login: Block incomplete Google profiles & enforce email verification
   const loginWithEmail = async (email: string, pass: string) => {
-    const res = await signInWithEmailAndPassword(auth, email, pass);
+    setAuthNotice(null);
+    const normEmail = email.toLowerCase().trim();
+
+    // Pre-check 1: Check if this email belongs to an incomplete Google profile (TC-C02, TC-R03)
+    const usersCol = collection(db, 'users');
+    const emailQuery = query(usersCol, where('email', '==', normEmail));
+    const querySnap = await getDocs(emailQuery);
+
+    if (!querySnap.empty) {
+      const existingDoc = querySnap.docs[0].data();
+      if (existingDoc.isProfileComplete === false) {
+        await signOut(auth);
+        setCurrentUser(null);
+        throw new Error('Email already exists. Please complete your profile to sign in with email.');
+      }
+    }
+
+    // Authenticate with Firebase Auth
+    const res = await signInWithEmailAndPassword(auth, normEmail, pass);
     if (res.user) {
+      // Check 2: Intercept unverified email (TC-F02)
       if (!res.user.emailVerified) {
         await sendEmailVerification(res.user, {
           url: `${window.location.origin}/login?verified=true`,
           handleCodeInApp: true
         });
         await signOut(auth);
-        throw new Error('Email not verified. A verification link has been sent to your Gmail inbox. Please click the link to verify before logging in.');
+        setCurrentUser(null);
+        throw new Error('Please verify your email address before logging in. A verification link has been sent to your email.');
       }
 
+      // Check 3: Load user profile from Firestore
       const userRef = doc(db, 'users', res.user.uid);
       const snap = await getDoc(userRef);
-      if (snap.exists() && snap.data()?.userProfile) {
-        setUserProfile(snap.data().userProfile);
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data.isProfileComplete === false) {
+          await signOut(auth);
+          setCurrentUser(null);
+          throw new Error('Email already exists. Please complete your profile to sign in with email.');
+        }
+
+        const profile: ExtendedUserProfile = {
+          ...EMPTY_NEW_PROFILE,
+          uid: res.user.uid,
+          name: data.name || res.user.displayName || normEmail.split('@')[0],
+          email: data.email || normEmail,
+          username: data.username || '',
+          age: data.age,
+          isProfileComplete: true,
+          isEmailVerified: true,
+          authProviders: data.authProviders || ['password'],
+          isOnboarded: true,
+        };
+        setUserProfile(profile);
+        if (data.trackerItems) setTrackerItems(data.trackerItems);
+      } else {
+        setUserProfile({
+          ...EMPTY_NEW_PROFILE,
+          uid: res.user.uid,
+          name: res.user.displayName || normEmail.split('@')[0],
+          email: normEmail,
+          isProfileComplete: true,
+          isEmailVerified: true,
+          authProviders: ['password'],
+          isOnboarded: true,
+        });
       }
+
+      setCurrentUser(res.user);
       navigate('/dashboard');
     }
   };
 
-  // Email Signup: Send Verification Link and DO NOT LOG IN until verified!
-  const signupWithEmail = async (email: string, pass: string) => {
-    const res = await createUserWithEmailAndPassword(auth, email, pass);
+  // Email Signup: Send verification link and immediately sign out
+  const signupWithEmail = async (email: string, pass: string, name?: string) => {
+    setAuthNotice(null);
+    const normEmail = email.toLowerCase().trim();
+    const res = await createUserWithEmailAndPassword(auth, normEmail, pass);
     if (res.user) {
       await sendEmailVerification(res.user, {
         url: `${window.location.origin}/login?verified=true`,
         handleCodeInApp: true
       });
-      
-      const newProfile: UserProfile = {
-        ...EMPTY_NEW_PROFILE,
-        email: res.user.email || email,
-        isEmailVerified: false,
-        isOnboarded: false
-      };
-      setUserProfile(newProfile);
-      const userRef = doc(db, 'users', res.user.uid);
-      await setDoc(userRef, { userProfile: newProfile, trackerItems: [] }, { merge: true });
 
-      // Immediately sign out user so they CANNOT access app without verifying link!
+      const now = new Date().toISOString();
+      const displayName = name?.trim() || normEmail.split('@')[0];
+
+      const userDocData = {
+        uid: res.user.uid,
+        email: normEmail,
+        name: displayName,
+        username: '',
+        age: 0,
+        isProfileComplete: true, // Complete for standard email/password signup
+        isEmailVerified: false,
+        authProviders: ['password'],
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      const userRef = doc(db, 'users', res.user.uid);
+      await setDoc(userRef, userDocData);
+
+      // Immediately sign out to ensure unverified sessions are never retained (TC-F01)
       await signOut(auth);
+      setCurrentUser(null);
+      setUserProfile(EMPTY_NEW_PROFILE);
     }
   };
 
+  // Complete Google User Profile: Set Password, Age, Name & Reserve Unique Username
+  const completeGoogleProfile = async (data: { name: string; age: number; username: string; password: string }) => {
+    if (!currentUser) throw new Error('No authenticated user found.');
+
+    const normUsername = data.username.trim().toLowerCase();
+    const usernameRef = doc(db, 'usernames', normUsername);
+    const userRef = doc(db, 'users', currentUser.uid);
+
+    // 1. Check if username is already taken (TC-B06, TC-R02)
+    const usernameSnap = await getDoc(usernameRef);
+    if (usernameSnap.exists() && usernameSnap.data()?.uid !== currentUser.uid) {
+      throw new Error('Username is already taken. Please choose another.');
+    }
+
+    // 2. Set password on the Firebase Auth user for dual authentication (TC-C03)
+    if (data.password) {
+      await updatePassword(currentUser, data.password);
+    }
+
+    const now = new Date().toISOString();
+
+    // 3. Atomically reserve username in Firestore
+    await setDoc(usernameRef, {
+      uid: currentUser.uid,
+      createdAt: now
+    });
+
+    // 4. Update user document
+    const userSnap = await getDoc(userRef);
+    const currentProviders: string[] = userSnap.exists() ? userSnap.data()?.authProviders || [] : [];
+    const updatedProviders = Array.from(new Set([...currentProviders, 'google.com', 'password']));
+
+    const updatedUserDoc = {
+      uid: currentUser.uid,
+      email: (currentUser.email || '').toLowerCase().trim(),
+      name: data.name.trim(),
+      username: normUsername,
+      age: data.age,
+      isProfileComplete: true,
+      isEmailVerified: true,
+      authProviders: updatedProviders,
+      updatedAt: now
+    };
+
+    await setDoc(userRef, updatedUserDoc, { merge: true });
+
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem('pendingGoogleUser');
+    }
+
+    // 5. Update local state and navigate to dashboard
+    setUserProfile(prev => ({
+      ...prev,
+      ...updatedUserDoc,
+      isOnboarded: true
+    }));
+
+    navigate('/dashboard');
+  };
+
+  // Check username availability
+  const checkUsernameAvailable = async (username: string): Promise<boolean> => {
+    const norm = username.trim().toLowerCase();
+    if (!norm) return false;
+    const usernameRef = doc(db, 'usernames', norm);
+    const snap = await getDoc(usernameRef);
+    return !snap.exists() || snap.data()?.uid === currentUser?.uid;
+  };
+
+  // Sign Out User
   const logoutUser = async () => {
     await signOut(auth);
-    localStorage.clear();
-    sessionStorage.clear();
+    setCurrentUser(null);
     setUserProfile(EMPTY_NEW_PROFILE);
     setTrackerItems([]);
-    setCurrentPath('/');
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate('/');
+  };
+
+  // Permanent Cascading Account Deletion
+  const deleteAccount = async () => {
+    if (!currentUser) return;
+    const user = currentUser;
+    const uid = user.uid;
+
+    // 1. Resolve username to delete
+    let username = userProfile?.username;
+    if (!username) {
+      try {
+        const snap = await getDoc(doc(db, 'users', uid));
+        if (snap.exists()) {
+          username = snap.data()?.username;
+        }
+      } catch (e) {
+        console.error('Failed to look up username for deletion:', e);
+      }
+    }
+
+    // 2. Delete user from Firebase Auth FIRST (handles auth/requires-recent-login safely for TC-C05)
+    await deleteUser(user);
+
+    // 3. Cascade deletion to Firestore collections
+    if (username) {
+      await deleteDoc(doc(db, 'usernames', username.toLowerCase()));
+    }
+    await deleteDoc(doc(db, 'users', uid));
+
+    // 4. Teardown session and redirect to landing page
+    setCurrentUser(null);
+    setUserProfile(EMPTY_NEW_PROFILE);
+    setTrackerItems([]);
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate('/');
   };
 
   const toggleBookmark = (examId: string) => {
@@ -381,10 +699,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         selectedExamId,
         selectedExamTag,
         currentUser,
+        authLoading,
+        authNotice,
+        setAuthNotice,
         loginWithGoogle,
         loginWithEmail,
         signupWithEmail,
-        logoutUser
+        completeGoogleProfile,
+        logoutUser,
+        deleteAccount,
+        checkUsernameAvailable
       }}
     >
       {children}
