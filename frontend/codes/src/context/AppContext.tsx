@@ -24,37 +24,38 @@ import {
   FirebaseUser
 } from '../firebase';
 
-export interface ExtendedUserProfile extends UserProfile {
-  username?: string;
-  age?: number;
-  uid?: string;
-  isProfileComplete?: boolean;
+export interface ExtendedUserProfile extends Omit<UserProfile, 'uid'> {
+  uid: string;
+  isEmailVerified?: boolean;
+  isOnboarded?: boolean;
   authProviders?: string[];
 }
 
 export const EMPTY_NEW_PROFILE: ExtendedUserProfile = {
-  name: '',
+  uid: '',
   email: '',
+  name: '',
   username: '',
-  age: 0,
   isProfileComplete: false,
-  isEmailVerified: false,
-  authProviders: [],
   dob: '',
   gender: '',
-  nationality: 'Indian',
+  fathersName: '',
+  mothersName: '',
   state: '',
   district: '',
-  education: [],
+  permanentAddress: '',
+  currentAddress: '',
   category: '',
   isPwbd: false,
+  disabilityType: '',
+  disabilityPercentage: '',
   isExServiceman: false,
-  disabilityStatus: false,
-  relaxationApplicable: false,
-  experienceYears: 0,
+  isGovtEmployee: false,
+  department: '',
+  parentsAnnualIncome: '',
+  education: [],
   preferredTypes: [],
-  preferredLocations: [],
-  isOnboarded: false
+  savedExams: [],
 };
 
 interface AppContextType {
@@ -178,7 +179,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             name: data?.name || firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split('@')[0] : 'Candidate'),
             email: data?.email || firebaseUser.email || '',
             username: data?.username || '',
-            age: data?.age,
+
             isProfileComplete: data?.isProfileComplete ?? false,
             isEmailVerified: firebaseUser.emailVerified || data?.isEmailVerified || false,
             authProviders: data?.authProviders || [],
@@ -310,7 +311,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           name: userData.name || displayName,
           email: userData.email || email,
           username: userData.username || '',
-          age: userData.age,
+
           isProfileComplete: userData.isProfileComplete ?? false,
           isEmailVerified: true,
           authProviders: updatedProviders,
@@ -336,7 +337,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           email,
           name: displayName,
           username: '',
-          age: 0,
+
           isProfileComplete: false,
           isEmailVerified: true,
           authProviders: ['google.com'],
@@ -407,7 +408,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           name: data.name || res.user.displayName || normEmail.split('@')[0],
           email: data.email || normEmail,
           username: data.username || '',
-          age: data.age,
+
           isProfileComplete: true,
           isEmailVerified: true,
           authProviders: data.authProviders || ['password'],
@@ -460,7 +461,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         email: normEmail,
         name: displayName,
         username: '',
-        age: 0,
+
         isProfileComplete: true, // Complete for standard email/password signup
         isEmailVerified: false,
         authProviders: ['password'],
@@ -515,7 +516,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       email: (currentUser.email || '').toLowerCase().trim(),
       name: data.name.trim(),
       username: normUsername,
-      age: data.age,
+
       isProfileComplete: true,
       isEmailVerified: true,
       authProviders: updatedProviders,

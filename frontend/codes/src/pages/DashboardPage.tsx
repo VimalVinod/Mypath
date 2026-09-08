@@ -165,7 +165,7 @@ export const DashboardPage: React.FC = () => {
                 <div style={{ marginTop: '0.5rem' }}>
                   <span style={{ fontSize: '0.85rem', color: '#64748B', display: 'block', marginBottom: '0.25rem' }}>Highest Qualification</span>
                   <span style={{ fontSize: '0.95rem', fontWeight: 600, color: '#0F172A', display: 'block' }}>
-                    {userProfile?.education && userProfile.education.length > 0 ? userProfile.education[0].degree : 'None added'}
+                    {userProfile?.education && userProfile.education.length > 0 ? userProfile.education[0].level : 'None added'}
                   </span>
                 </div>
               </div>

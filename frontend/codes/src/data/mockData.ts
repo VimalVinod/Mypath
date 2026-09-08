@@ -1,24 +1,30 @@
 import { Exam, UserProfile, CareerQuestion, NotificationItem, ResourceItem } from '../types';
 
 export const EMPTY_NEW_PROFILE: UserProfile = {
-  name: '',
+  uid: '',
   email: '',
-  isEmailVerified: false,
+  name: '',
+  username: '',
+  isProfileComplete: false,
   dob: '',
   gender: '',
-  nationality: 'Indian',
+  fathersName: '',
+  mothersName: '',
   state: '',
   district: '',
-  education: [],
-  category: '' as UserProfile['category'],
+  permanentAddress: '',
+  currentAddress: '',
+  category: '',
   isPwbd: false,
+  disabilityType: '',
+  disabilityPercentage: '',
   isExServiceman: false,
-  disabilityStatus: false,
-  relaxationApplicable: false,
-  experienceYears: 0,
+  isGovtEmployee: false,
+  department: '',
+  parentsAnnualIncome: '',
+  education: [],
   preferredTypes: [],
-  preferredLocations: [],
-  isOnboarded: false
+  savedExams: [],
 };
 
 export const INITIAL_USER_PROFILE: UserProfile = EMPTY_NEW_PROFILE;

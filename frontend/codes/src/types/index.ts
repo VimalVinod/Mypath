@@ -39,32 +39,58 @@ export interface TrackerItem {
   reminderDate?: string;
 }
 
+export interface Education {
+  id: string;
+  level: string; // e.g., 10th, 12th, Diploma, Graduate, PG, PhD
+  boardOrUniversity: string;
+  passingYear: string;
+  percentageOrCgpa: string;
+  streamOrSubject: string;
+}
+
 export interface UserProfile {
-  name: string;
+  uid: string;
   email: string;
-  isEmailVerified: boolean;
+  name: string;
+  username: string;
+  isProfileComplete: boolean;
+  
+  // Personal Details
   dob: string;
   gender: string;
-  nationality: string;
+  fathersName: string;
+  mothersName: string;
+
+  // Address
   state: string;
   district: string;
-  education: Array<{
-    id: string;
-    level: string; // e.g., '10th', '12th', 'Diploma', 'Graduation', 'Post Graduation', 'PhD'
-    degree: string;
-    institution: string;
-    passingYear: string;
-    percentage: string;
-  }>;
-  category: 'General' | 'OBC-NCL' | 'OBC' | 'SC' | 'ST' | 'EWS' | '';
+  permanentAddress: string;
+  currentAddress: string;
+
+  // Demographics / Category
+  category: 'General' | 'EWS' | 'OBC-NCL' | 'SC' | 'ST' | '';
+  
+  // Disability
   isPwbd: boolean;
+  disabilityType: string;
+  disabilityPercentage: string;
+
+  // Employment & Relaxation
   isExServiceman: boolean;
-  disabilityStatus: boolean; // Legacy/Alias
-  relaxationApplicable: boolean;
-  experienceYears: number;
+  isGovtEmployee: boolean;
+  department: string;
+
+  // Family
+  parentsAnnualIncome: string;
+
+  // Education array
+  education: Education[];
+
+  // Analytics & tracking
   preferredTypes: string[];
-  preferredLocations: string[];
-  isOnboarded: boolean;
+  savedExams: string[];
+  createdAt?: any;
+  updatedAt?: any;
 }
 
 export interface CareerQuestion {
