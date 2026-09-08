@@ -52,7 +52,7 @@ export const LandingPage: React.FC = () => {
     if (isPaused || banners.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % banners.length);
-    }, 3000);
+    }, 6000);
     return () => clearInterval(interval);
   }, [isPaused, banners.length]);
 
@@ -97,7 +97,7 @@ export const LandingPage: React.FC = () => {
                   height: '100%',
                   opacity: currentSlide === idx ? 1 : 0,
                   pointerEvents: currentSlide === idx ? 'auto' : 'none',
-                  transition: 'opacity 0.4s ease-in-out',
+                  transition: 'opacity 0.8s ease-in-out',
                   userSelect: 'none'
                 }}
               >

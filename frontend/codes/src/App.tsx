@@ -10,13 +10,20 @@ import { DashboardPage } from './pages/DashboardPage';
 
 import { CookieConsentBanner } from './components/CookieConsentBanner';
 
+import { BrowseExamsPage } from './pages/BrowseExamsPage';
+import { TrackerPage } from './pages/TrackerPage';
+import { ProfilePage } from './pages/ProfilePage';
+
 const MainRouter: React.FC = () => {
   const { currentPath, currentUser, userProfile, authLoading, authNotice, navigate, setAuthNotice } = useApp();
 
   useEffect(() => {
     if (authLoading) return;
 
-    if (currentPath === '/dashboard') {
+    // Protected routes array
+    const protectedRoutes = ['/dashboard', '/exams', '/tracker', '/profile'];
+    
+    if (protectedRoutes.includes(currentPath)) {
       if (!currentUser) {
         navigate('/login');
         return;
@@ -44,7 +51,9 @@ const MainRouter: React.FC = () => {
     }
   }, [currentPath, currentUser, userProfile, authLoading, navigate, setAuthNotice]);
 
-  if (currentPath === '/dashboard') {
+  const protectedRoutes = ['/dashboard', '/exams', '/tracker', '/profile'];
+
+  if (protectedRoutes.includes(currentPath)) {
     if (authLoading) {
       return (
         <div 
@@ -96,7 +105,12 @@ const MainRouter: React.FC = () => {
     if (userProfile && userProfile.isProfileComplete === false) {
       return <ProfileCompletionPage />;
     }
-    return <DashboardPage />;
+    
+    // Render specific protected pages
+    if (currentPath === '/dashboard') return <DashboardPage />;
+    if (currentPath === '/exams') return <BrowseExamsPage />;
+    if (currentPath === '/tracker') return <TrackerPage />;
+    if (currentPath === '/profile') return <ProfilePage />;
   }
 
   if (currentPath === '/login') {

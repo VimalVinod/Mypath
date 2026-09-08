@@ -33,14 +33,15 @@ import {
   onSnapshot 
 } from 'firebase/firestore';
 
-// Valid Firebase configuration for project ID: examgoo
+// Valid Firebase configuration for project ID: mypath0
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyA4zbNx-Bs4rGdGMIXKsGSlMdBay8FWk3U",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "examgoo.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "examgoo",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "examgoo.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "472919780617",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:472919780617:web:4e02ef528d008dbc11f7d8"
+  apiKey: "AIzaSyD3-t03tS8cc4tuabP_lZpPOOHbQGJY9_w",
+  authDomain: "mypath0.firebaseapp.com",
+  projectId: "mypath0",
+  storageBucket: "mypath0.firebasestorage.app",
+  messagingSenderId: "1061068106762",
+  appId: "1:1061068106762:web:bb8bd57c6c4574441343f3",
+  measurementId: "G-XMGZW1C5SE"
 };
 
 // Initialize Firebase

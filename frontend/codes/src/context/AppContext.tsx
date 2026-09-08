@@ -329,24 +329,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAuthNotice(null);
     const normEmail = email.toLowerCase().trim();
 
-    // Pre-check 1: Check if this email belongs to an incomplete Google profile (TC-C02, TC-R03)
-    const usersCol = collection(db, 'users');
-    const emailQuery = query(usersCol, where('email', '==', normEmail));
-    const querySnap = await getDocs(emailQuery);
-
-    if (!querySnap.empty) {
-      const existingDoc = querySnap.docs[0].data();
-      if (existingDoc.isProfileComplete === false) {
-        await signOut(auth);
-        setCurrentUser(null);
-        throw new Error('Email already exists. Please complete your profile to sign in with email.');
-      }
-    }
-
-    // Authenticate with Firebase Auth
+    // Step 1: Authenticate first
     const res = await signInWithEmailAndPassword(auth, normEmail, pass);
     if (res.user) {
-      // Check 2: Intercept unverified email (TC-F02)
+      // Step 2: Block unverified emails
       if (!res.user.emailVerified) {
         await sendEmailVerification(res.user, {
           url: `${window.location.origin}/login?verified=true`,
@@ -357,11 +343,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         throw new Error('Please verify your email address before logging in. A verification link has been sent to your email.');
       }
 
-      // Check 3: Load user profile from Firestore
+      // Step 3: Load user profile from Firestore (user is now authenticated)
       const userRef = doc(db, 'users', res.user.uid);
       const snap = await getDoc(userRef);
+
       if (snap.exists()) {
         const data = snap.data();
+
+        // Block incomplete Google profiles from email login
         if (data.isProfileComplete === false) {
           await signOut(auth);
           setCurrentUser(null);
