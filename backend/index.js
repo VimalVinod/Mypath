@@ -90,7 +90,13 @@ app.post('/send-verification', async (req, res) => {
   }
 });
 
+// Export the app for Vercel Serverless Functions
+module.exports = app;
+
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-  console.log(\`Backend server running on port \${PORT}\`);
-});
+// Only listen if not running in Vercel
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Backend server running on port ${PORT}`);
+  });
+}
