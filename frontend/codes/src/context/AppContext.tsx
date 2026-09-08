@@ -130,6 +130,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  // ==============================================================
+  // RENDER PRE-WARM SCRIPT (Prevents Cold Starts)
+  // ==============================================================
+  useEffect(() => {
+    const pingBackend = async () => {
+      try {
+        // Ping the backend to wake it up silently
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://mypath-backend.onrender.com';
+        await fetch(`${backendUrl}/ping`, { method: 'GET' });
+        console.log('Backend pre-warmed successfully.');
+      } catch (err) {
+        // Silently fail if backend is still waking up or unreachable
+      }
+    };
+
+    // Ping on initial load
+    pingBackend();
+
+    // Ping every 10 minutes to keep it awake while the user is actively browsing
+    const intervalId = setInterval(pingBackend, 10 * 60 * 1000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   // Firebase Auth Listener with Session Hydration
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
