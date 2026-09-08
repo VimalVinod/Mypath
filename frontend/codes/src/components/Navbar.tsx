@@ -114,7 +114,7 @@ export const Navbar: React.FC = () => {
               <button 
                 className="btn btn-ghost"
                 style={{ position: 'relative', padding: '0.5rem', borderRadius: '50%', color: '#FFFFFF' }}
-                onClick={() => navigate('/notifications')}
+                onClick={() => navigate('/dashboard')}
                 title="Notifications"
               >
                 <Bell size={18} color="#FFFFFF" />
