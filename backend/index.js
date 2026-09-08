@@ -67,9 +67,8 @@ app.post('/send-verification', async (req, res) => {
     `;
 
     // 3. Send via Resend
-    // I noticed in your screenshot the tab said "wildcodestudios" instead of "wildportstudios"
-    // So I am updating this to match to prevent any Resend verification errors!
-    const senderEmail = process.env.SENDER_EMAIL || 'MyPath Team <noreply@wildcodestudios.com>';
+    // Updated to wildcodestudios.in based on your clarification!
+    const senderEmail = process.env.SENDER_EMAIL || 'MyPath Team <noreply@wildcodestudios.in>';
     
     const { data, error } = await resend.emails.send({
       from: senderEmail,
