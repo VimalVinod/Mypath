@@ -418,10 +418,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const normEmail = email.toLowerCase().trim();
     const res = await createUserWithEmailAndPassword(auth, normEmail, pass);
     if (res.user) {
-      await sendEmailVerification(res.user, {
-        url: `${window.location.origin}/login?verified=true`,
-        handleCodeInApp: true
-      });
+      // Instead of default Firebase email, call our custom Render backend
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://mypath-backend.onrender.com';
+      try {
+        await fetch(`${backendUrl}/send-verification`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: normEmail, name: name })
+        });
+        console.log('Custom verification email requested successfully.');
+      } catch (err) {
+        console.error('Failed to send custom verification email:', err);
+      }
 
       const now = new Date().toISOString();
       const displayName = name?.trim() || normEmail.split('@')[0];
