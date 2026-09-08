@@ -6,7 +6,7 @@ import { User, MapPin, GraduationCap, Briefcase, Users, Save, Plus, X, ShieldAle
 import { statesAndDistricts } from '../data/statesAndDistricts';
 
 export const ProfilePage: React.FC = () => {
-  const { currentUser, userProfile, updateUserProfile, navigate } = useApp();
+  const { currentUser, userProfile, updateUserProfile, navigate, logoutUser } = useApp();
   
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -392,7 +392,17 @@ export const ProfilePage: React.FC = () => {
             </div>
           </section>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem', alignItems: 'center' }}>
+            <button 
+              type="button" 
+              onClick={() => logoutUser()}
+              style={{ padding: '0.6rem 1.25rem', backgroundColor: 'transparent', color: '#EF4444', border: '1px solid #FECACA', borderRadius: '8px', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', transition: 'background-color 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.backgroundColor = '#FEF2F2'}
+              onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+            >
+              Sign Out
+            </button>
+
             <button 
               type="submit" 
               disabled={isSaving}
