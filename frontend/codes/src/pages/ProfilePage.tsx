@@ -13,6 +13,7 @@ export const ProfilePage: React.FC = () => {
 
   // Form State
   const [formData, setFormData] = useState({
+    name: '',
     dob: '',
     gender: '',
     category: '',
@@ -26,6 +27,7 @@ export const ProfilePage: React.FC = () => {
   useEffect(() => {
     if (userProfile) {
       setFormData({
+        name: userProfile.name || currentUser?.displayName || '',
         dob: userProfile.dob || '',
         gender: userProfile.gender || '',
         category: userProfile.category || '',
@@ -36,7 +38,7 @@ export const ProfilePage: React.FC = () => {
         education: userProfile.education ? [...userProfile.education] : [],
       });
     }
-  }, [userProfile]);
+  }, [userProfile, currentUser]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -74,8 +76,8 @@ export const ProfilePage: React.FC = () => {
     setSaveSuccess(false);
 
     try {
-      if (!formData.dob || !formData.gender || !formData.category || !formData.state) {
-        throw new Error("Please fill in all the required personal and demographic fields.");
+      if (!formData.name || !formData.dob || !formData.gender || !formData.category || !formData.state) {
+        throw new Error("Please fill in your name and all the required personal and demographic fields.");
       }
 
       await updateUserProfile({
@@ -122,8 +124,8 @@ export const ProfilePage: React.FC = () => {
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem' }}>Full Name</label>
-                <input type="text" value={displayName} disabled style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #E2E8F0', backgroundColor: '#F8FAFC', color: '#94A3B8' }} />
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem' }}>Full Name *</label>
+                <input type="text" name="name" value={formData.name} onChange={handleChange} required style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF', color: '#0F172A' }} />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem' }}>Email Address</label>

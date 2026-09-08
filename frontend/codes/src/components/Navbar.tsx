@@ -67,16 +67,6 @@ export const Navbar: React.FC = () => {
                   Browse Exams
                 </a>
               </li>
-              <li>
-                <a 
-                  href="/tracker" 
-                  onClick={(e) => { e.preventDefault(); navigate('/tracker'); }} 
-                  className={`nav-link ${currentPath === '/tracker' ? 'active' : ''}`}
-                  style={{ color: '#FFFFFF' }}
-                >
-                  Tracker
-                </a>
-              </li>
             </ul>
           ) : null}
         </div>
