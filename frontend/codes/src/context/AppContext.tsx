@@ -137,7 +137,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const pingBackend = async () => {
       try {
         // Ping the backend to wake it up silently
-        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://mypath-backend.onrender.com';
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://mypath-backend-two.vercel.app';
         await fetch(`${backendUrl}/ping`, { method: 'GET' });
         console.log('Backend pre-warmed successfully.');
       } catch (err) {
@@ -419,7 +419,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const res = await createUserWithEmailAndPassword(auth, normEmail, pass);
     if (res.user) {
       // Instead of default Firebase email, call our custom Render backend
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://mypath-backend.onrender.com';
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://mypath-backend-two.vercel.app';
       try {
         await fetch(`${backendUrl}/send-verification`, {
           method: 'POST',
