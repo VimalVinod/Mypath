@@ -357,10 +357,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (res.user) {
       // Step 2: Block unverified emails
       if (!res.user.emailVerified) {
-        await sendEmailVerification(res.user, {
-          url: `${window.location.origin}/login?verified=true`,
-          handleCodeInApp: true
-        });
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://mypath-backend-two.vercel.app';
+        try {
+          await fetch(`${backendUrl}/send-verification`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: normEmail })
+          });
+        } catch (err) {
+          console.error('Failed to send verification from login:', err);
+        }
         await signOut(auth);
         setCurrentUser(null);
         throw new Error('Please verify your email address before logging in. A verification link has been sent to your email.');
