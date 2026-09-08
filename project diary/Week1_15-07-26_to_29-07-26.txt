@@ -1,0 +1,27 @@
+﻿College of Engineering, Chengannur
+Department of Computer Engineering
+BTech Computer Science and Engineering
+CSD415 Project Phase 1 (2026)
+Periodic Report: 15-07-26 to 29-07-26 (Week 1)
+Title: MyPath - Discover and Track Your Exam Matches
+Project Group Number: 15
+
++----------------+---------------------------+---------------------------+---------------------------+---------------+
+| Who?           | Work Assigned             | Work Done                 | Work Scheduled for next   | Assessment by |
+|                |                           |                           | 14 Days                   | Guide         |
++----------------+---------------------------+---------------------------+---------------------------+---------------+
+| Roll No: 04    | Define project scope and  | Finalized project idea,   | Design wireframes for     |               |
+| Abhishek S     | requirements. Set up      | created GitHub repo,      | Landing Page, Login and   |               |
+| Kumar          | development environment   | initialized React and     | Sign Up pages. Begin      |               |
+|                | and project structure.    | Firebase project.         | building frontend.        |               |
++----------------+---------------------------+---------------------------+---------------------------+---------------+
+| Roll No: 62    | Research existing exam    | Completed literature      | Prepare documentation     |               |
+| Varada T V     | tracking platforms.       | survey. Documented        | outline. Design           |               |
+|                | Prepare project           | project objectives,       | Firestore schema for      |               |
+|                | documentation outline.    | scope and methodology.    | users and exams.          |               |
++----------------+---------------------------+---------------------------+---------------------------+---------------+
+| Roll No: 69    |                           |                           |                           |               |
+| Vimal Vinod    |                           |                           |                           |               |
+|                |                           |                           |                           |               |
+|                |                           |                           |                           |               |
++----------------+---------------------------+---------------------------+---------------------------+---------------+

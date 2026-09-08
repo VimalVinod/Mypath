@@ -84,179 +84,224 @@ export const DashboardPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Quick Actions Row */}
+        {/* Main Content Grid */}
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
-          gap: '1rem', 
-          marginBottom: '2rem' 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
+          gap: '1.5rem', 
+          alignItems: 'start' 
         }}>
-          {/* View All Exams — Primary CTA */}
-          <button
-            onClick={() => navigate('/exams')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              padding: '1.25rem 1.5rem',
-              backgroundColor: '#09090B',
-              color: '#FFFFFF',
-              border: 'none',
-              borderRadius: 'var(--radius-card)',
-              cursor: 'pointer',
-              textAlign: 'left',
-              transition: 'transform 0.15s ease',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
-            onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
-          >
-            <div style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '10px',
-              backgroundColor: 'var(--brand-red)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}>
-              <BookOpen size={20} color="#FFFFFF" />
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>Browse All Exams</div>
-              <div style={{ fontSize: '0.78rem', opacity: 0.7, marginTop: '2px' }}>Discover exams you're eligible for</div>
-            </div>
-            <ChevronRight size={18} style={{ opacity: 0.5 }} />
-          </button>
-
-          {/* My Tracker */}
-          <button
-            onClick={() => navigate('/tracker')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              padding: '1.25rem 1.5rem',
-              backgroundColor: '#FFFFFF',
-              color: 'var(--text-primary)',
-              border: '1.5px solid var(--border)',
-              borderRadius: 'var(--radius-card)',
-              cursor: 'pointer',
-              textAlign: 'left',
-              transition: 'transform 0.15s ease',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
-            onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
-          >
-            <div style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '10px',
-              backgroundColor: 'var(--success-bg)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}>
-              <ClipboardList size={20} color="var(--success)" />
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>My Tracker</div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '2px' }}>Track your applications</div>
-            </div>
-            <ChevronRight size={18} style={{ color: 'var(--text-muted)' }} />
-          </button>
-
-          {/* My Profile */}
-          <button
-            onClick={() => navigate('/profile')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              padding: '1.25rem 1.5rem',
-              backgroundColor: '#FFFFFF',
-              color: 'var(--text-primary)',
-              border: '1.5px solid var(--border)',
-              borderRadius: 'var(--radius-card)',
-              cursor: 'pointer',
-              textAlign: 'left',
-              transition: 'transform 0.15s ease',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
-            onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
-          >
-            <div style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '10px',
-              backgroundColor: 'var(--accent-light)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}>
-              <User size={20} color="var(--brand-red)" />
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>My Profile</div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '2px' }}>View & edit your details</div>
-            </div>
-            <ChevronRight size={18} style={{ color: 'var(--text-muted)' }} />
-          </button>
-        </div>
-
-        {/* Main Content Area */}
-        <div style={{ display: 'grid', gap: '1.5rem', alignItems: 'start' }}>
           
-          {/* Notifications Section */}
-          <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: 'var(--radius-card)',
-            border: '1.5px solid var(--border)',
-            overflow: 'hidden',
-          }}>
+          {/* Left Column: Academic & Personal Profile */}
+          <div style={{ display: 'grid', gap: '1.5rem' }}>
             <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '1.25rem 1.5rem',
-              borderBottom: '1px solid var(--border)',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                <Bell size={18} color="var(--text-primary)" />
-                <h2 style={{ fontSize: '1rem', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>Notifications</h2>
-              </div>
-            </div>
-
-            {/* Empty State */}
-            <div style={{
-              padding: '3rem 1.5rem',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'center',
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-card)',
+              border: '1px solid #E2E8F0',
+              overflow: 'hidden',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
             }}>
               <div style={{
-                width: '56px',
-                height: '56px',
-                borderRadius: '50%',
-                backgroundColor: 'var(--bg-subtle)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '1rem',
+                justifyContent: 'space-between',
+                padding: '1.25rem 1.5rem',
+                borderBottom: '1px solid #E2E8F0',
+                backgroundColor: '#F8FAFC'
               }}>
-                <BellOff size={24} color="var(--text-muted)" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <User size={18} color="#334155" />
+                  <h2 style={{ fontSize: '1rem', fontWeight: 600, color: '#0F172A', margin: 0 }}>Academic Profile</h2>
+                </div>
+                <button 
+                  onClick={() => navigate('/profile')}
+                  style={{ 
+                    fontSize: '0.85rem', 
+                    color: '#2563EB', 
+                    background: 'none', 
+                    border: 'none', 
+                    cursor: 'pointer',
+                    fontWeight: 500
+                  }}>
+                  Edit Details
+                </button>
               </div>
-              <p style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
-                No notifications yet
-              </p>
-              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', maxWidth: '320px' }}>
-                When exams you're tracking have updates, deadlines, or announcements, they'll show up here.
-              </p>
+
+              <div style={{ padding: '1.5rem' }}>
+                <p style={{ fontSize: '0.85rem', color: '#64748B', marginBottom: '1.5rem' }}>
+                  Complete your academic profile to get accurate exam recommendations.
+                </p>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>Age</label>
+                    <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>{userProfile?.age || 'Not specified'}</div>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>Degree / Program</label>
+                    <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>Not specified</div>
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>College / University</label>
+                  <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>Not specified</div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem', borderTop: '1px solid #E2E8F0', paddingTop: '1.5rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>High School</label>
+                    <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>Not specified</div>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>School Grades / Percentage</label>
+                    <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>Not specified</div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>College Pass Year</label>
+                    <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>Not specified</div>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>School Pass Year</label>
+                    <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>Not specified</div>
+                  </div>
+                </div>
+
+              </div>
             </div>
+          </div>
+
+          {/* Right Column: Actions & Notifications */}
+          <div style={{ display: 'grid', gap: '1.5rem' }}>
+            
+            {/* Unified Exam Actions */}
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-card)',
+              border: '1px solid #E2E8F0',
+              overflow: 'hidden',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            }}>
+              <div style={{
+                padding: '1.25rem 1.5rem',
+                borderBottom: '1px solid #E2E8F0',
+                backgroundColor: '#F8FAFC'
+              }}>
+                <h2 style={{ fontSize: '1rem', fontWeight: 600, color: '#0F172A', margin: 0 }}>Exam Journey</h2>
+              </div>
+              <div style={{ padding: '1rem' }}>
+                <button
+                  onClick={() => navigate('/exams')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    width: '100%',
+                    padding: '1rem',
+                    backgroundColor: '#FFFFFF',
+                    color: '#0F172A',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.15s ease',
+                    marginBottom: '0.75rem'
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#94A3B8'; e.currentTarget.style.backgroundColor = '#F8FAFC'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.backgroundColor = '#FFFFFF'; }}
+                >
+                  <Search size={20} color="#334155" />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>Browse Exams</div>
+                    <div style={{ fontSize: '0.8rem', color: '#64748B', marginTop: '2px' }}>Find exams tailored to your profile</div>
+                  </div>
+                  <ChevronRight size={18} color="#94A3B8" />
+                </button>
+
+                <button
+                  onClick={() => navigate('/tracker')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    width: '100%',
+                    padding: '1rem',
+                    backgroundColor: '#FFFFFF',
+                    color: '#0F172A',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#94A3B8'; e.currentTarget.style.backgroundColor = '#F8FAFC'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.backgroundColor = '#FFFFFF'; }}
+                >
+                  <ClipboardList size={20} color="#334155" />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>My Tracker</div>
+                    <div style={{ fontSize: '0.8rem', color: '#64748B', marginTop: '2px' }}>Manage saved exams and deadlines</div>
+                  </div>
+                  <ChevronRight size={18} color="#94A3B8" />
+                </button>
+              </div>
+            </div>
+
+            {/* Notifications Section */}
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-card)',
+              border: '1px solid #E2E8F0',
+              overflow: 'hidden',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '1.25rem 1.5rem',
+                borderBottom: '1px solid #E2E8F0',
+                backgroundColor: '#F8FAFC'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <Bell size={18} color="#334155" />
+                  <h2 style={{ fontSize: '1rem', fontWeight: 600, color: '#0F172A', margin: 0 }}>Notifications</h2>
+                </div>
+              </div>
+
+              {/* Empty State */}
+              <div style={{
+                padding: '3.5rem 1.5rem',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+              }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  backgroundColor: '#F1F5F9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '1rem',
+                }}>
+                  <BellOff size={20} color="#94A3B8" />
+                </div>
+                <p style={{ fontWeight: 500, fontSize: '0.95rem', color: '#334155', margin: '0 0 0.35rem 0' }}>
+                  You're all caught up
+                </p>
+                <p style={{ fontSize: '0.85rem', color: '#64748B', maxWidth: '280px', margin: 0, lineHeight: 1.5 }}>
+                  Updates, upcoming deadlines, and announcements will appear here.
+                </p>
+              </div>
+            </div>
+
           </div>
         </div>
       </main>
