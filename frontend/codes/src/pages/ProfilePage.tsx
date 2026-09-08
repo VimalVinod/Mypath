@@ -6,7 +6,7 @@ import { User, MapPin, GraduationCap, Briefcase, Users, Save, Plus, X, ShieldAle
 import { statesAndDistricts } from '../data/statesAndDistricts';
 
 export const ProfilePage: React.FC = () => {
-  const { currentUser, userProfile, updateUserProfile, navigate, logoutUser } = useApp();
+  const { currentUser, userProfile, updateUserProfile, navigate, logoutUser, deleteAccount } = useApp();
   
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -144,6 +144,21 @@ export const ProfilePage: React.FC = () => {
     }
   };
 
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently lost."
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await deleteAccount();
+      // AppContext handles navigation after deletion
+    } catch (err: any) {
+      setSaveError(err.message || 'Failed to delete account. Please try again or log out and log back in.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const states = Object.keys(statesAndDistricts).sort();
   const districts = formData.state ? (statesAndDistricts[formData.state] || []).sort() : [];
 
@@ -184,9 +199,20 @@ export const ProfilePage: React.FC = () => {
           
           {/* Section 1: Personal Details */}
           <section style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.15rem', fontWeight: 700, borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem', color: '#0F172A' }}>
-              <User size={20} color="#2563EB" /> Personal Details
-            </h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
+              <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.15rem', fontWeight: 700, margin: 0, color: '#0F172A' }}>
+                <User size={20} color="#2563EB" /> Personal Details
+              </h2>
+              <button 
+                type="button" 
+                onClick={handleDelete}
+                style={{ padding: '0.4rem 0.85rem', backgroundColor: '#FEF2F2', color: '#DC2626', border: '1px solid #FECACA', borderRadius: '6px', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', transition: 'background-color 0.2s', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                onMouseEnter={e => e.currentTarget.style.backgroundColor = '#FEE2E2'}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = '#FEF2F2'}
+              >
+                Delete Account
+              </button>
+            </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem' }}>Full Name *</label>
