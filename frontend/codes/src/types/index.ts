@@ -47,15 +47,19 @@ export interface UserProfile {
   gender: string;
   nationality: string;
   state: string;
+  district: string;
   education: Array<{
-    qualification: string;
-    field: string;
+    id: string;
+    level: string; // e.g., '10th', '12th', 'Diploma', 'Graduation', 'Post Graduation', 'PhD'
+    degree: string;
     institution: string;
-    year: string;
-    score: string;
+    passingYear: string;
+    percentage: string;
   }>;
-  category: 'General' | 'OBC' | 'SC' | 'ST' | 'EWS';
-  disabilityStatus: boolean;
+  category: 'General' | 'OBC-NCL' | 'OBC' | 'SC' | 'ST' | 'EWS' | '';
+  isPwbd: boolean;
+  isExServiceman: boolean;
+  disabilityStatus: boolean; // Legacy/Alias
   relaxationApplicable: boolean;
   experienceYears: number;
   preferredTypes: string[];

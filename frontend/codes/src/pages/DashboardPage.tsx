@@ -97,7 +97,7 @@ export const DashboardPage: React.FC = () => {
             <div style={{
               backgroundColor: '#FFFFFF',
               borderRadius: 'var(--radius-card)',
-              border: '1px solid #E2E8F0',
+              border: userProfile?.isProfileComplete ? '1px solid #E2E8F0' : '1px solid #FEF08A',
               overflow: 'hidden',
               boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
             }}>
@@ -106,71 +106,90 @@ export const DashboardPage: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '1.25rem 1.5rem',
-                borderBottom: '1px solid #E2E8F0',
-                backgroundColor: '#F8FAFC'
+                borderBottom: userProfile?.isProfileComplete ? '1px solid #E2E8F0' : '1px solid #FEF08A',
+                backgroundColor: userProfile?.isProfileComplete ? '#F8FAFC' : '#FEF9C3'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                  <User size={18} color="#334155" />
-                  <h2 style={{ fontSize: '1rem', fontWeight: 600, color: '#0F172A', margin: 0 }}>Academic Profile</h2>
+                  <User size={18} color={userProfile?.isProfileComplete ? '#334155' : '#CA8A04'} />
+                  <h2 style={{ fontSize: '1rem', fontWeight: 600, color: userProfile?.isProfileComplete ? '#0F172A' : '#854D0E', margin: 0 }}>
+                    Academic Profile {userProfile?.isProfileComplete ? '' : <span style={{ fontSize: '0.75rem', backgroundColor: '#FEF08A', color: '#854D0E', padding: '2px 8px', borderRadius: '12px', marginLeft: '8px', fontWeight: 700 }}>INCOMPLETE</span>}
+                  </h2>
                 </div>
-                <button 
-                  onClick={() => navigate('/profile')}
-                  style={{ 
-                    fontSize: '0.85rem', 
-                    color: '#2563EB', 
-                    background: 'none', 
-                    border: 'none', 
-                    cursor: 'pointer',
-                    fontWeight: 500
-                  }}>
-                  Edit Details
-                </button>
+                {userProfile?.isProfileComplete && (
+                  <button 
+                    onClick={() => navigate('/profile')}
+                    style={{ 
+                      fontSize: '0.85rem', 
+                      color: '#2563EB', 
+                      background: 'none', 
+                      border: 'none', 
+                      cursor: 'pointer',
+                      fontWeight: 500
+                    }}>
+                    Edit Details
+                  </button>
+                )}
               </div>
 
-              <div style={{ padding: '1.5rem' }}>
-                <p style={{ fontSize: '0.85rem', color: '#64748B', marginBottom: '1.5rem' }}>
-                  Complete your academic profile to get accurate exam recommendations.
-                </p>
+              {userProfile?.isProfileComplete ? (
+                <div style={{ padding: '1.5rem' }}>
+                  <p style={{ fontSize: '0.85rem', color: '#64748B', marginBottom: '1.5rem' }}>
+                    Your academic profile is up to date for exam recommendations.
+                  </p>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>Age</label>
-                    <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>{userProfile?.age || 'Not specified'}</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>Date of Birth</label>
+                      <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>{userProfile?.dob || 'Not specified'}</div>
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>Highest Degree</label>
+                      <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>{userProfile?.education && userProfile.education.length > 0 ? userProfile.education[0].degree : 'Not specified'}</div>
+                    </div>
                   </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>Degree / Program</label>
-                    <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>Not specified</div>
+
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>Institution</label>
+                    <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>{userProfile?.education && userProfile.education.length > 0 ? userProfile.education[0].institution : 'Not specified'}</div>
                   </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem', borderTop: '1px solid #E2E8F0', paddingTop: '1.5rem' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>Category</label>
+                      <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>{userProfile?.category || 'General'}</div>
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>State</label>
+                      <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>{userProfile?.state || 'Not specified'}</div>
+                    </div>
+                  </div>
+
                 </div>
-
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>College / University</label>
-                  <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>Not specified</div>
+              ) : (
+                <div style={{ padding: '2rem 1.5rem', textAlign: 'center' }}>
+                  <p style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500, marginBottom: '0.5rem' }}>
+                    We don't know what exams you are eligible for!
+                  </p>
+                  <p style={{ fontSize: '0.85rem', color: '#64748B', marginBottom: '2rem', maxWidth: '300px', margin: '0 auto 2rem' }}>
+                    Please complete your personal and academic profile (Date of Birth, Education, Category, etc.) so we can find exactly which government exams you qualify for.
+                  </p>
+                  <button 
+                    onClick={() => navigate('/profile')}
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      backgroundColor: '#EAB308',
+                      color: '#422006',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 6px -1px rgba(234, 179, 8, 0.2)'
+                    }}
+                  >
+                    Complete Your Profile
+                  </button>
                 </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem', borderTop: '1px solid #E2E8F0', paddingTop: '1.5rem' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>High School</label>
-                    <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>Not specified</div>
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>School Grades / Percentage</label>
-                    <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>Not specified</div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>College Pass Year</label>
-                    <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>Not specified</div>
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', marginBottom: '0.3rem', textTransform: 'uppercase' }}>School Pass Year</label>
-                    <div style={{ fontSize: '0.95rem', color: '#0F172A', fontWeight: 500 }}>Not specified</div>
-                  </div>
-                </div>
-
-              </div>
+              )}
             </div>
           </div>
 

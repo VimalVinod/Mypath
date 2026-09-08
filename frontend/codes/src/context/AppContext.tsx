@@ -44,8 +44,11 @@ export const EMPTY_NEW_PROFILE: ExtendedUserProfile = {
   gender: '',
   nationality: 'Indian',
   state: '',
+  district: '',
   education: [],
-  category: 'General',
+  category: '',
+  isPwbd: false,
+  isExServiceman: false,
   disabilityStatus: false,
   relaxationApplicable: false,
   experienceYears: 0,
@@ -58,7 +61,7 @@ interface AppContextType {
   currentPath: string;
   navigate: (path: string) => void;
   userProfile: ExtendedUserProfile;
-  updateUserProfile: (profile: Partial<ExtendedUserProfile>) => void;
+  updateUserProfile: (profile: Partial<ExtendedUserProfile>) => Promise<void>;
   exams: Exam[];
   trackerItems: TrackerItem[];
   toggleBookmark: (examId: string) => void;
@@ -231,8 +234,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (typeof window !== 'undefined') window.scrollTo(0, 0);
   };
 
-  const updateUserProfile = (updated: Partial<ExtendedUserProfile>) => {
-    setUserProfile(prev => ({ ...prev, ...updated }));
+  const updateUserProfile = async (updated: Partial<ExtendedUserProfile>) => {
+    if (currentUser) {
+      try {
+        const userRef = doc(db, 'users', currentUser.uid);
+        const updatedData = { ...updated, updatedAt: new Date().toISOString() };
+        await setDoc(userRef, updatedData, { merge: true });
+        setUserProfile(prev => ({ ...prev, ...updatedData }));
+      } catch (err) {
+        console.error('Failed to update profile in Firestore:', err);
+        throw err;
+      }
+    } else {
+      setUserProfile(prev => ({ ...prev, ...updated }));
+    }
   };
 
   // Google Sign-In with Automatic Account Linking & Profile Enforcement
