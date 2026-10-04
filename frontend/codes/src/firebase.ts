@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
-import { 
-  getAuth, 
+import {
+  getAuth,
+  linkWithPopup, 
   GoogleAuthProvider, 
   signInWithPopup, 
   signInWithEmailAndPassword, 
@@ -52,6 +53,7 @@ export const googleProvider = new GoogleAuthProvider();
 
 export {
   signInWithPopup,
+  linkWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendEmailVerification,

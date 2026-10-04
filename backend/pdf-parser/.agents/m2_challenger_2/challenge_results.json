@@ -1,0 +1,39 @@
+{
+  "total": 58,
+  "passed": 58,
+  "failed": 0,
+  "crashed": 0,
+  "suites": {
+    "Suite 1": {
+      "total": 16,
+      "passed": 16,
+      "failed": 0,
+      "crashed": 0
+    },
+    "Suite 2": {
+      "total": 13,
+      "passed": 13,
+      "failed": 0,
+      "crashed": 0
+    },
+    "Suite 3": {
+      "total": 11,
+      "passed": 11,
+      "failed": 0,
+      "crashed": 0
+    },
+    "Suite 4": {
+      "total": 16,
+      "passed": 16,
+      "failed": 0,
+      "crashed": 0
+    },
+    "Suite 5": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "crashed": 0
+    }
+  },
+  "failures": []
+}

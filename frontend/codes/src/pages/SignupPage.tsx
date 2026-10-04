@@ -11,6 +11,7 @@ export const SignupPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [consent, setConsent] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -37,6 +38,11 @@ export const SignupPage: React.FC = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email.trim())) {
       setErrorMsg('Please enter a valid email address.');
+      return;
+    }
+
+    if (!consent) {
+      setErrorMsg('You must agree to the Terms of Service and Privacy Policy.');
       return;
     }
 
@@ -220,11 +226,26 @@ export const SignupPage: React.FC = () => {
             </div>
           </div>
 
+          <div className="form-group" style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '1rem', marginTop: '0.5rem' }}>
+            <input 
+              type="checkbox" 
+              id="consent-checkbox" 
+              checked={consent} 
+              onChange={(e) => { setConsent(e.target.checked); setErrorMsg(null); }}
+              required
+              style={{ marginTop: '0.2rem', cursor: 'pointer' }}
+            />
+            <label htmlFor="consent-checkbox" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', cursor: 'pointer', lineHeight: '1.4' }}>
+              I agree to the <a href="/terms" onClick={(e) => { e.preventDefault(); navigate('/terms'); }} style={{ color: 'var(--brand-red)' }}>Terms of Service</a> and <a href="/privacy" onClick={(e) => { e.preventDefault(); navigate('/privacy'); }} style={{ color: 'var(--brand-red)' }}>Privacy Policy</a>.
+            </label>
+          </div>
+
           <button 
             type="submit" 
             className="btn btn-primary btn-full" 
             style={{ marginTop: '0.5rem' }} 
-            disabled={loading}
+            disabled={loading || !consent}
+            aria-label="Create Account Button"
           >
             {loading ? 'Creating Account...' : 'Create Account'}
           </button>

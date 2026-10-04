@@ -1,4 +1,4 @@
-﻿College of Engineering, Chengannur
+College of Engineering, Chengannur
 Department of Computer Engineering
 BTech Computer Science and Engineering
 CSD415 Project Phase 1 (2026)
@@ -10,18 +10,15 @@ Project Group Number: 15
 | Who?           | Work Assigned             | Work Done                 | Work Scheduled for next   | Assessment by |
 |                |                           |                           | 14 Days                   | Guide         |
 +----------------+---------------------------+---------------------------+---------------------------+---------------+
-| Roll No: 04    | Build Landing Page and    | Completed responsive      | Implement Google Sign-In  |               |
-| Abhishek S     | authentication UI.        | Landing Page with         | and Email/Password auth   |               |
-| Kumar          | Implement Firebase        | banner animations.        | with email verification.  |               |
-|                | project configuration.    | Set up Firebase Auth.     | Begin Dashboard UI.       |               |
+| Roll No: 04    | Read 4 research papers    | Reviewed 4 papers and     | Project analysis and SRS  |               |
+| Abhishek S     | and prepare presentation. | delivered presentation.   | report drafting. Build    |               |
+| Kumar          |                           |                           | authentication UI.        |               |
 +----------------+---------------------------+---------------------------+---------------------------+---------------+
-| Roll No: 62    | Design Firestore schema   | Drafted Firestore         | Write SRS document.       |               |
-| Varada T V     | for users, exams and      | schema for users, exams   | Plan extended user        |               |
-|                | tracker. Plan user        | and tracker. Reviewed     | profile fields: college,  |               |
-|                | profile data fields.      | data models.              | degree, school details.   |               |
+| Roll No: 62    | Read 4 research papers    | Reviewed 4 papers and     | Decompose project into    |               |
+| Varada T V     | and draft literature      | drafted literature        | functional requirements.  |               |
+|                | survey.                   | report.                   |                           |               |
 +----------------+---------------------------+---------------------------+---------------------------+---------------+
-| Roll No: 69    |                           |                           |                           |               |
-| Vimal Vinod    |                           |                           |                           |               |
-|                |                           |                           |                           |               |
-|                |                           |                           |                           |               |
+| Roll No: 69    | Read 4 research papers,   | Reviewed 4 papers, did    | Assist with project       |               |
+| Vimal Vinod    | feasibility and Zeroth    | feasibility and Zeroth    | analysis. Set up backend  |               |
+|                | review.                   | review.                   | Express server.           |               |
 +----------------+---------------------------+---------------------------+---------------------------+---------------+

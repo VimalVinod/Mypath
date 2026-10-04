@@ -51,9 +51,8 @@ export interface Education {
 export interface UserProfile {
   uid: string;
   email: string;
+  isProfileComplete?: boolean;
   name: string;
-  username: string;
-  isProfileComplete: boolean;
   
   // Personal Details
   dob: string;

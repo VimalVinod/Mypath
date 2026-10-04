@@ -1,0 +1,21 @@
+{
+    "name": "mypath-scraper",
+    "version": "1.0.0",
+    "main": "src/scripts/pipeline.js",
+    "scripts": {
+        "scrape": "node src/scripts/scrape.js --dry-run",
+        "scrape:notify": "node src/scripts/scrape.js --notify",
+        "test:notify": "node src/scripts/test-email.js",
+        "test": "node --test test/*.test.js",
+        "preview": "node preview.js"
+    },
+    "dependencies": {
+        "@google/genai": "^2.22.0",
+        "cheerio": "^1.2.0",
+        "dotenv": "^17.4.2",
+        "firebase": "^12.19.0",
+        "pdf-lib": "^1.17.1",
+        "resend": "^6.26.0",
+        "unpdf": "^1.8.1"
+    }
+}

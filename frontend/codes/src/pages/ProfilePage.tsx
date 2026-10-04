@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { Navbar } from '../components/Navbar';
-import { Footer } from '../components/Footer';
+import { SidebarLayout } from '../components/SidebarLayout';
 import { User, MapPin, GraduationCap, Briefcase, Users, Save, Plus, X, ShieldAlert } from 'lucide-react';
 import { statesAndDistricts } from '../data/statesAndDistricts';
 
 export const ProfilePage: React.FC = () => {
-  const { currentUser, userProfile, updateUserProfile, navigate, logoutUser, deleteAccount } = useApp();
+  const { currentUser, userProfile, updateUserProfile, navigate, logoutUser, deleteAccount, linkGoogleAccount, linkPasswordAccount } = useApp();
+  const [newPassword, setNewPassword] = useState('');
   
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -17,8 +17,6 @@ export const ProfilePage: React.FC = () => {
     name: '',
     dob: '',
     gender: '',
-    fathersName: '',
-    mothersName: '',
     state: '',
     district: '',
     permanentAddress: '',
@@ -41,8 +39,6 @@ export const ProfilePage: React.FC = () => {
         name: userProfile.name || currentUser?.displayName || '',
         dob: userProfile.dob || '',
         gender: userProfile.gender || '',
-        fathersName: userProfile.fathersName || '',
-        mothersName: userProfile.mothersName || '',
         state: userProfile.state || '',
         district: userProfile.district || '',
         permanentAddress: userProfile.permanentAddress || '',
@@ -123,11 +119,24 @@ export const ProfilePage: React.FC = () => {
 
       const { isSameAddress, ...profileDataToSave } = formData;
 
-      await updateUserProfile({
+            await updateUserProfile({
         ...profileDataToSave,
         category: profileDataToSave.category as any,
         isProfileComplete: true 
       });
+
+      // INSTANT MATCH - Real-time sync with backend!
+      if (currentUser?.uid) {
+        try {
+          await fetch('https://mypath-backend-two.vercel.app/match-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: currentUser?.uid })
+          });
+        } catch (e) {
+          console.warn('Silent fallback: Could not reach matching service immediately.');
+        }
+      }
       
       setSaveSuccess(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -162,46 +171,36 @@ export const ProfilePage: React.FC = () => {
   const states = Object.keys(statesAndDistricts).sort();
   const districts = formData.state ? (statesAndDistricts[formData.state] || []).sort() : [];
 
-  return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#F8FAFC' }}>
-      <Navbar />
 
-      <main style={{ flex: 1, maxWidth: '1000px', width: '100%', margin: '0 auto', padding: '2.5rem 1.5rem' }}>
-        <div style={{ marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: '1.85rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: '#0F172A', marginBottom: '0.4rem' }}>
-            Candidate Profile
-          </h1>
-          <p style={{ fontSize: '0.95rem', color: '#64748B' }}>
-            Provide your exact details as they appear on your official certificates to find accurate exam matches.
-          </p>
-        </div>
+  return (
+    <SidebarLayout pageTitle="My Profile" activeNav="profile">
 
         {saveSuccess && (
-          <div style={{ backgroundColor: '#ECFDF5', border: '1px solid #A7F3D0', padding: '1rem', borderRadius: '8px', color: '#065F46', marginBottom: '1.5rem', fontWeight: 500 }}>
-            Profile saved successfully!
+          <div style={{ backgroundColor: '#F0FDF4', border: '1px solid #BBF7D0', padding: '0.875rem 1.25rem', borderRadius: '10px', color: '#065F46', marginBottom: '1.5rem', fontWeight: 500, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            âœ“ Profile saved successfully!
           </div>
         )}
 
         {saveError && (
-          <div style={{ backgroundColor: '#FEF2F2', border: '1px solid #FECACA', padding: '1rem', borderRadius: '8px', color: '#991B1B', marginBottom: '1.5rem', fontWeight: 500 }}>
+          <div style={{ backgroundColor: '#FEF2F2', border: '1px solid #FECACA', padding: '0.875rem 1.25rem', borderRadius: '10px', color: '#991B1B', marginBottom: '1.5rem', fontWeight: 500, fontSize: '0.9rem' }}>
             {saveError}
           </div>
         )}
 
         {!userProfile?.isProfileComplete && !saveSuccess && (
-          <div style={{ backgroundColor: '#FFF7ED', border: '1px solid #FED7AA', padding: '1rem', borderRadius: '8px', color: '#9A3412', marginBottom: '1.5rem', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-            <ShieldAlert size={20} />
-            <span style={{ fontWeight: 500 }}>Complete your profile to unlock the dashboard and exam recommendations.</span>
+          <div style={{ backgroundColor: '#FFF7ED', border: '1px solid #FED7AA', padding: '0.875rem 1.25rem', borderRadius: '10px', color: '#9A3412', marginBottom: '1.5rem', display: 'flex', gap: '0.75rem', alignItems: 'center', fontSize: '0.9rem' }}>
+            <ShieldAlert size={18} />
+            <span style={{ fontWeight: 500 }}>Fill in your details below so we can find exams you're eligible for.</span>
           </div>
         )}
 
-        <form onSubmit={handleSave} style={{ display: 'grid', gap: '2rem' }}>
+        <form onSubmit={handleSave} style={{ display: 'grid', gap: '1.25rem' }}>
           
           {/* Section 1: Personal Details */}
           <section style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
-              <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.15rem', fontWeight: 700, margin: 0, color: '#0F172A' }}>
-                <User size={20} color="#2563EB" /> Personal Details
+              <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem', fontWeight: 700, margin: 0, color: '#0F172A' }}>
+                <User size={18} color="#6B8E23" /> Personal Details
               </h2>
               <button 
                 type="button" 
@@ -222,14 +221,8 @@ export const ProfilePage: React.FC = () => {
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem' }}>Email Address</label>
                 <input type="email" value={userProfile?.email || currentUser?.email || ''} disabled style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #E2E8F0', backgroundColor: '#F8FAFC', color: '#94A3B8' }} />
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem' }}>Father's Name</label>
-                <input type="text" name="fathersName" value={formData.fathersName} onChange={handleChange} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #CBD5E1' }} />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem' }}>Mother's Name</label>
-                <input type="text" name="mothersName" value={formData.mothersName} onChange={handleChange} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #CBD5E1' }} />
-              </div>
+              
+              
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem' }}>Date of Birth *</label>
                 <input type="date" name="dob" value={formData.dob} onChange={handleChange} required style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #CBD5E1' }} />
@@ -261,10 +254,11 @@ export const ProfilePage: React.FC = () => {
             </div>
           </section>
 
+          
           {/* Section 2: Address */}
           <section style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.15rem', fontWeight: 700, borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem', color: '#0F172A' }}>
-              <MapPin size={20} color="#10B981" /> Address & Domicile
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem', fontWeight: 700, borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem', color: '#0F172A' }}>
+              <MapPin size={18} color="#6B8E23" /> Address & Domicile
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
               <div>
@@ -303,8 +297,8 @@ export const ProfilePage: React.FC = () => {
 
           {/* Section 3: Educational Qualifications */}
           <section style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.15rem', fontWeight: 700, borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem', color: '#0F172A' }}>
-              <GraduationCap size={20} color="#8B5CF6" /> Educational Qualifications
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem', fontWeight: 700, borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem', color: '#0F172A' }}>
+              <GraduationCap size={18} color="#6B8E23" /> Educational Qualifications
             </h2>
             
             {formData.education.map((edu, index) => (
@@ -354,8 +348,8 @@ export const ProfilePage: React.FC = () => {
 
           {/* Section 4: Disability & Employment */}
           <section style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.15rem', fontWeight: 700, borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem', color: '#0F172A' }}>
-              <Briefcase size={20} color="#F59E0B" /> Special Status & Employment
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem', fontWeight: 700, borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem', color: '#0F172A' }}>
+              <Briefcase size={18} color="#6B8E23" /> Special Status & Employment
             </h2>
             
             <div style={{ display: 'grid', gap: '1.5rem' }}>
@@ -402,12 +396,12 @@ export const ProfilePage: React.FC = () => {
 
           {/* Section 5: Family Details */}
           <section style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.15rem', fontWeight: 700, borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem', color: '#0F172A' }}>
-              <Users size={20} color="#06B6D4" /> Family Details
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem', fontWeight: 700, borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem', color: '#0F172A' }}>
+              <Users size={18} color="#6B8E23" /> Family Details
             </h2>
             
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem' }}>Parents' Annual Income (₹)</label>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem' }}>Parents' Annual Income (â‚¹)</label>
               <select name="parentsAnnualIncome" value={formData.parentsAnnualIncome} onChange={handleChange} style={{ width: '100%', maxWidth: '350px', padding: '0.75rem', borderRadius: '8px', border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF' }}>
                 <option value="">Select Income Bracket</option>
                 <option value="Below 2.5 Lakhs">Below 2.5 Lakhs</option>
@@ -418,33 +412,23 @@ export const ProfilePage: React.FC = () => {
             </div>
           </section>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem', alignItems: 'center' }}>
-            <button 
-              type="button" 
-              onClick={() => logoutUser()}
-              style={{ padding: '0.6rem 1.25rem', backgroundColor: 'transparent', color: '#EF4444', border: '1px solid #FECACA', borderRadius: '8px', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', transition: 'background-color 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.backgroundColor = '#FEF2F2'}
-              onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
-            >
-              Sign Out
-            </button>
-
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
             <button 
               type="submit" 
               disabled={isSaving}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.85rem 2rem', backgroundColor: '#2563EB', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '1rem', cursor: isSaving ? 'not-allowed' : 'pointer', opacity: isSaving ? 0.7 : 1, boxShadow: '0 4px 6px -1px rgba(37,99,235,0.2)' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.85rem 2.25rem', backgroundColor: '#6B8E23', color: 'white', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '1rem', cursor: isSaving ? 'not-allowed' : 'pointer', opacity: isSaving ? 0.7 : 1, boxShadow: '0 4px 12px rgba(107,142,35,0.25)' }}
             >
-              <Save size={20} />
-              {isSaving ? 'Saving Profile...' : 'Save Profile Details'}
+              <Save size={18} />
+              {isSaving ? 'Saving...' : 'Save Profile'}
             </button>
           </div>
 
         </form>
-      </main>
-
-      <Footer />
-    </div>
+    </SidebarLayout>
   );
 };
 
 export default ProfilePage;
+
+
+

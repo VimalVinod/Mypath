@@ -4,8 +4,6 @@ export const EMPTY_NEW_PROFILE: UserProfile = {
   uid: '',
   email: '',
   name: '',
-  username: '',
-  isProfileComplete: false,
   dob: '',
   gender: '',
   fathersName: '',

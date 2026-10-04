@@ -1,4 +1,4 @@
-﻿College of Engineering, Chengannur
+College of Engineering, Chengannur
 Department of Computer Engineering
 BTech Computer Science and Engineering
 CSD415 Project Phase 1 (2026)
@@ -10,18 +10,15 @@ Project Group Number: 15
 | Who?           | Work Assigned             | Work Done                 | Work Scheduled for next   | Assessment by |
 |                |                           |                           | 14 Days                   | Guide         |
 +----------------+---------------------------+---------------------------+---------------------------+---------------+
-| Roll No: 04    | Build Dashboard, Profile  | Completed Dashboard and   | Redesign Dashboard with   |               |
-| Abhishek S     | and Tracker pages.        | Profile pages. Integrated | detailed user profile     |               |
-| Kumar          | Integrate custom HTML     | custom HTML email via     | section (college, degree, |               |
-|                | email via Resend+Vercel.  | Resend and Vercel.        | school, grades, age).     |               |
+| Roll No: 04    | Submit the project design | Completed design report.  | First interim evaluation  |               |
+| Abhishek S     | report. Implementation    | Full stack frontend       | preparation.              |               |
+| Kumar          | of project features.      | deployed on Firebase.     |                           |               |
 +----------------+---------------------------+---------------------------+---------------------------+---------------+
-| Roll No: 62    | Finalize project report   | Completed project report  | Update Firestore and      |               |
-| Varada T V     | documentation. Update     | documentation and system  | documentation to reflect  |               |
-|                | Firestore with complete   | architecture diagrams.    | new profile fields and    |               |
-|                | exam dataset.             | Updated exam database.    | notification schema.      |               |
+| Roll No: 62    | Submit project design     | Completed design report   | First interim evaluation  |               |
+| Varada T V     | report. Update project    | and architecture          | preparation.              |               |
+|                | documentation.            | diagrams.                 |                           |               |
 +----------------+---------------------------+---------------------------+---------------------------+---------------+
-| Roll No: 69    |                           |                           |                           |               |
-| Vimal Vinod    |                           |                           |                           |               |
-|                |                           |                           |                           |               |
-|                |                           |                           |                           |               |
+| Roll No: 69    | Implementation of the     | Full stack dev (backend   | Finalize version control  |               |
+| Vimal Vinod    | project base paper.       | scraper, email pipeline,  | and deploy.               |               |
+|                |                           | 179 tests passing).       |                           |               |
 +----------------+---------------------------+---------------------------+---------------------------+---------------+

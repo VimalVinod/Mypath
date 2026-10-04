@@ -352,7 +352,7 @@ export const LandingPage: React.FC = () => {
               Find Exams You Actually Qualify For.
             </h2>
             <p className="feature-description" style={{ color: '#52525B' }}>
-              Stop wasting hours reading through complex official notifications. Input your age, education, and background once, and we'll instantly show you every central and state government exam you are eligible to take.
+              Stop wasting hours reading through complex official notifications. Input your age, education, and background once, and we'll instantly show you relevant central and state government exams you might be eligible to take.
             </p>
           </div>
           <div className="feature-image-block">

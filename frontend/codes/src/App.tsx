@@ -5,17 +5,21 @@ import { AppProvider, useApp } from './context/AppContext';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
-import { ProfileCompletionPage } from './pages/ProfileCompletionPage';
 import { DashboardPage } from './pages/DashboardPage';
-
 import { CookieConsentBanner } from './components/CookieConsentBanner';
-
 import { BrowseExamsPage } from './pages/BrowseExamsPage';
 import { TrackerPage } from './pages/TrackerPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { NotificationsPage } from './pages/NotificationsPage';
+
+// Import Legal Pages
+import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
+import { TermsPage } from './pages/TermsPage';
+import { CookiePolicyPage } from './pages/CookiePolicyPage';
+import { RefundPolicyPage } from './pages/RefundPolicyPage';
 
 const MainRouter: React.FC = () => {
-  const { currentPath, currentUser, userProfile, authLoading, authNotice, navigate, setAuthNotice } = useApp();
+  const { currentPath, currentUser, authLoading, authNotice, navigate, setAuthNotice } = useApp();
 
   useEffect(() => {
     if (authLoading) return;
@@ -33,23 +37,8 @@ const MainRouter: React.FC = () => {
         navigate('/login');
         return;
       }
-      if (userProfile && userProfile.isProfileComplete === false) {
-        navigate('/complete-profile');
-        return;
-      }
     }
-
-    if (currentPath === '/complete-profile') {
-      if (!currentUser) {
-        navigate('/login');
-        return;
-      }
-      if (userProfile && userProfile.isProfileComplete === true) {
-        navigate('/dashboard');
-        return;
-      }
-    }
-  }, [currentPath, currentUser, userProfile, authLoading, navigate, setAuthNotice]);
+  }, [currentPath, currentUser, authLoading, navigate, setAuthNotice]);
 
   const protectedRoutes = ['/dashboard', '/exams', '/tracker', '/profile'];
 
@@ -102,15 +91,13 @@ const MainRouter: React.FC = () => {
         </div>
       );
     }
-    if (userProfile && userProfile.isProfileComplete === false) {
-      return <ProfileCompletionPage />;
-    }
     
     // Render specific protected pages
     if (currentPath === '/dashboard') return <DashboardPage />;
     if (currentPath === '/exams') return <BrowseExamsPage />;
     if (currentPath === '/tracker') return <TrackerPage />;
     if (currentPath === '/profile') return <ProfilePage />;
+    if (currentPath === '/notifications') return <NotificationsPage />;
   }
 
   if (currentPath === '/login') {
@@ -142,19 +129,46 @@ const MainRouter: React.FC = () => {
     );
   }
 
-  if (currentPath === '/complete-profile') {
-    if (!authLoading && !currentUser) {
-      return <LoginPage />;
-    }
-    return <ProfileCompletionPage />;
-  }
-
   switch (currentPath) {
     case '/signup':
       return <SignupPage />;
+    case '/privacy':
+      return <PrivacyPolicyPage />;
+    case '/terms':
+      return <TermsPage />;
+    case '/cookies':
+      return <CookiePolicyPage />;
+    case '/refund':
+      return <RefundPolicyPage />;
     case '/':
-    default:
       return <LandingPage />;
+    default:
+      return (
+        <div style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#F8FAFC',
+          fontFamily: 'sans-serif',
+          gap: '1rem',
+          textAlign: 'center',
+          padding: '2rem'
+        }}>
+          <div style={{ fontSize: '6rem', fontWeight: 800, color: '#E2E8F0', lineHeight: 1 }}>404</div>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0F172A', margin: 0 }}>Page Not Found</h1>
+          <p style={{ fontSize: '1rem', color: '#64748B', maxWidth: '380px', margin: 0 }}>
+            The page <strong style={{ color: '#EF4444' }}>{currentPath}</strong> doesn't exist. It may have been moved or removed.
+          </p>
+          <button
+            onClick={() => window.history.back()}
+            style={{ padding: '0.65rem 1.5rem', backgroundColor: '#0F172A', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '0.95rem', cursor: 'pointer', marginTop: '0.5rem' }}
+          >
+            Go Back
+          </button>
+        </div>
+      );
   }
 };
 

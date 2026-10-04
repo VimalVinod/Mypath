@@ -1,31 +1,38 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Usernames collection: used for unique handle reservation
-    match /usernames/{username} {
-      // Allow anyone to check if a username is available
-      allow read: if true;
-      // Allow authenticated user to claim a username for themselves
-      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
-      // Allow authenticated user to delete their own claimed username
-      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
-      // Disallow updating existing reservations
-      allow update: if false;
-    }
-
-    // Users collection: user profiles
     match /users/{userId} {
-      // Allow reading user documents for login checks and profile verification
-      allow read: if true;
-      // Allow users to create or update their own profile document
-      allow create, update: if request.auth != null && request.auth.uid == userId;
-      // Allow users to delete their own profile document
-      allow delete: if request.auth != null && request.auth.uid == userId;
+      // Only authenticated users can read profiles (no public access)
+      allow read: if request.auth != null;
+      // Allow creating a new profile document for your own UID
+      allow create: if request.auth != null && request.auth.uid == userId;
+      // Allow updating if it's your own UID OR if your verified Google email matches
+      allow update: if request.auth != null && (
+        request.auth.uid == userId || 
+        (request.auth.token.email != null && resource.data.email == request.auth.token.email)
+      );
+      // Allow deletion if it's your UID or your emails match
+      allow delete: if request.auth != null && (
+        request.auth.uid == userId || 
+        (request.auth.token.email != null && resource.data.email == request.auth.token.email)
+      );
     }
 
-    // Default catch-all rule
+    // Exams collection: readable by all logged-in users, writable only by admins (backend service account)
+    match /exams/{examId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Only Firebase Admin SDK (backend) can write
+    }
+
+    // Notifications log: users can only read their own
+    match /notifications/{userId}/{document=**} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false; // Only backend writes
+    }
+
+    // Default catch-all: deny everything not explicitly allowed
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if false;
     }
   }
 }

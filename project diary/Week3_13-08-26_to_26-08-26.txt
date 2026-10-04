@@ -1,4 +1,4 @@
-﻿College of Engineering, Chengannur
+College of Engineering, Chengannur
 Department of Computer Engineering
 BTech Computer Science and Engineering
 CSD415 Project Phase 1 (2026)
@@ -10,18 +10,15 @@ Project Group Number: 15
 | Who?           | Work Assigned             | Work Done                 | Work Scheduled for next   | Assessment by |
 |                |                           |                           | 14 Days                   | Guide         |
 +----------------+---------------------------+---------------------------+---------------------------+---------------+
-| Roll No: 04    | Implement full auth flow  | Completed Email and       | Build initial Dashboard   |               |
-| Abhishek S     | with Google Sign-In,      | Google Sign-In with       | and Profile pages.        |               |
-| Kumar          | account linking and       | account linking and       | Add exam tracker UI       |               |
-|                | profile completion step.  | profile completion.       | and session persistence.  |               |
+| Roll No: 04    | Submit SRS report.        | Finalized and submitted   | Project design report.    |               |
+| Abhishek S     | Implement frontend auth   | SRS document. Completed   | Build Dashboard and       |               |
+| Kumar          | and profile pages.        | auth and profile UI.      | Profile pages.            |               |
 +----------------+---------------------------+---------------------------+---------------------------+---------------+
-| Roll No: 62    | Populate Firestore with   | Added exam data for 10+   | Update Firestore schema   |               |
-| Varada T V     | exam data. Finalize       | government exams.         | to include extended       |               |
-|                | extended user profile     | Completed SRS first       | user profile fields.      |               |
-|                | schema in documentation.  | draft.                    | Document auth flow.       |               |
+| Roll No: 62    | Decompose project into    | Defined core functional   | Assist with project       |               |
+| Varada T V     | functional requirements.  | requirements. Designed    | design report.            |               |
+|                |                           | Firestore schema.         |                           |               |
 +----------------+---------------------------+---------------------------+---------------------------+---------------+
-| Roll No: 69    |                           |                           |                           |               |
-| Vimal Vinod    |                           |                           |                           |               |
-|                |                           |                           |                           |               |
-|                |                           |                           |                           |               |
+| Roll No: 69    | Design the project        | Created system design     | Base paper implementation |               |
+| Vimal Vinod    | backend architecture.     | architecture. Built       | (frontend and backend).   |               |
+|                |                           | scraper base module.      |                           |               |
 +----------------+---------------------------+---------------------------+---------------------------+---------------+

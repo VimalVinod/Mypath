@@ -1,30 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 
+const setCookie = (name: string, value: string, days: number) => {
+  const date = new Date();
+  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+  const expires = "expires=" + date.toUTCString();
+  document.cookie = name + "=" + value + ";" + expires + ";path=/;SameSite=Lax";
+};
+
+const getCookie = (name: string) => {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for(let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+  }
+  return null;
+};
+
 export const CookieConsentBanner: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   const { currentUser } = useApp();
 
   useEffect(() => {
-    // Only show the banner inside the web app (logged in)
-    if (currentUser) {
-      const consent = localStorage.getItem('cookie_consent');
-      if (!consent) {
-        setIsVisible(true);
-      }
-    } else {
-      setIsVisible(false);
+    // Check both cookie and localStorage for backwards compatibility
+    const cookieConsent = getCookie('cookie_consent');
+    const localConsent = localStorage.getItem('cookie_consent');
+    
+    if (!cookieConsent && !localConsent) {
+      setIsVisible(true);
     }
-  }, [currentUser]);
+  }, []);
 
   const acceptCookies = () => {
     localStorage.setItem('cookie_consent', 'true');
+    setCookie('cookie_consent', 'true', 365); // Cookie valid for 1 year
     setIsVisible(false);
   };
 
   const declineCookies = () => {
     localStorage.setItem('cookie_consent', 'false');
+    setCookie('cookie_consent', 'false', 365);
     setIsVisible(false);
   };
 

@@ -1,0 +1,34 @@
+{
+  "total": 45,
+  "passed": 45,
+  "failed": 0,
+  "categories": {
+    "Area 1: Age Boundaries": {
+      "total": 12,
+      "passed": 12,
+      "failed": 0
+    },
+    "Area 2: Statutory Relaxation": {
+      "total": 10,
+      "passed": 10,
+      "failed": 0
+    },
+    "Area 3: Education Hierarchy": {
+      "total": 10,
+      "passed": 10,
+      "failed": 0
+    },
+    "Area 4: Date & Calendar": {
+      "total": 6,
+      "passed": 6,
+      "failed": 0
+    },
+    "Area 5: Security & Robustness": {
+      "total": 7,
+      "passed": 7,
+      "failed": 0
+    }
+  },
+  "findings": [],
+  "gateVerdict": "APPROVE"
+}

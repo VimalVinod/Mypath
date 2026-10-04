@@ -1,11 +1,14 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+﻿import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Exam, UserProfile, TrackerItem, NotificationItem, ApplicationStatus, CareerResult } from '../types';
-import { MOCK_EXAMS, INITIAL_NOTIFICATIONS } from '../data/mockData';
+import { INITIAL_NOTIFICATIONS } from '../data/mockData';
 import { 
   auth, 
   db, 
   googleProvider, 
   signInWithPopup, 
+  linkWithPopup,
+  linkWithCredential,
+  EmailAuthProvider,
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   sendEmailVerification,
@@ -29,18 +32,18 @@ export interface ExtendedUserProfile extends Omit<UserProfile, 'uid'> {
   isEmailVerified?: boolean;
   isOnboarded?: boolean;
   authProviders?: string[];
+  avatarUrl?: string;
+  eligibleExams?: string[];
 }
 
 export const EMPTY_NEW_PROFILE: ExtendedUserProfile = {
   uid: '',
   email: '',
   name: '',
-  username: '',
   isProfileComplete: false,
   dob: '',
   gender: '',
-  fathersName: '',
-  mothersName: '',
+  accountName: '',
   state: '',
   district: '',
   permanentAddress: '',
@@ -56,6 +59,8 @@ export const EMPTY_NEW_PROFILE: ExtendedUserProfile = {
   education: [],
   preferredTypes: [],
   savedExams: [],
+  avatarUrl: '',
+  eligibleExams: [],
 };
 
 interface AppContextType {
@@ -87,10 +92,10 @@ interface AppContextType {
   loginWithGoogle: () => Promise<void>;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   signupWithEmail: (email: string, pass: string, name?: string) => Promise<void>;
-  completeGoogleProfile: (data: { name: string; age: number; username: string; password: string }) => Promise<void>;
+  linkGoogleAccount: () => Promise<void>;
+  linkPasswordAccount: (password: string) => Promise<void>;
   logoutUser: () => Promise<void>;
   deleteAccount: () => Promise<void>;
-  checkUsernameAvailable: (username: string) => Promise<boolean>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -107,7 +112,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [authLoading, setAuthLoading] = useState<boolean>(true);
   const [authNotice, setAuthNotice] = useState<string | null>(null);
 
-  const [selectedExamId, setSelectedExamId] = useState<string | null>('upsc-cse-2026');
+  const [selectedExamId, setSelectedExamId] = useState<string | null>(null);
   const [selectedExamTag, setSelectedExamTag] = useState<string>('upsc');
 
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(() => {
@@ -117,10 +122,59 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // User profile state
   const [userProfile, setUserProfile] = useState<ExtendedUserProfile>(EMPTY_NEW_PROFILE);
 
-  // Tracker items state
+  // Tracker items state â€” clear mock data
   const [trackerItems, setTrackerItems] = useState<TrackerItem[]>([]);
 
-  const [exams] = useState<Exam[]>(MOCK_EXAMS);
+  const [exams, setExams] = useState<Exam[]>([]);
+
+  useEffect(() => {
+    const fetchExams = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'exams'));
+        const fetchedExams = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          const deadline = data.deadlineDate ? new Date(data.deadlineDate) : new Date();
+          const daysRemaining = Math.max(0, Math.ceil((deadline.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)));
+          
+          // Determine if the user is eligible by checking their assigned hashes
+          const isEligible = userProfile?.eligibleExams?.includes(doc.id);
+
+          return {
+            id: doc.id,
+            name: data.name || data.title || data.examName || '',
+            shortName: data.shortName || data.title || data.examName || '',
+            organization: data.organization || data.conductingBody || '',
+            type: data.type || 'Government',
+            matchLevel: isEligible ? 'Eligible' : 'Not Eligible',
+            deadlineDate: data.deadlineDate || data.importantDates?.applicationEndDate || new Date().toISOString(),
+            daysRemaining,
+            notificationDate: data.notificationDate || data.importantDates?.notificationDate || new Date().toISOString(),
+            applicationStartDate: data.applicationStartDate || data.importantDates?.applicationStartDate || new Date().toISOString(),
+            examDate: data.examDate || data.importantDates?.examDate || new Date().toISOString(),
+            officialUrl: data.officialUrl || data.officialNotificationUrl || '#',
+            state: data.state || 'All India',
+            tags: data.tags || ['trending'],
+            eligibilityBreakdown: data.eligibilityBreakdown || {
+              qualification: { met: true, detail: 'Any Degree' },
+              age: { met: true, detail: '18-30 years' },
+              category: { met: true, detail: 'General' },
+              experience: { met: true, detail: 'Fresher eligible' }
+            },
+            description: data.description || ''
+          } as Exam;
+        });
+
+        setExams(fetchedExams);
+      } catch (err) {
+        console.error('Failed to fetch exams from Firebase Firestore:', err);
+      }
+    };
+    
+    // Only fetch exams after we know who the user is (or if auth is loaded)
+    if (!authLoading) {
+      fetchExams();
+    }
+  }, [authLoading, userProfile?.eligibleExams]);
   const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
   const [careerAnswers, setCareerAnswers] = useState<Record<number, string>>({});
   const [careerResult, setCareerResult] = useState<CareerResult | null>(null);
@@ -137,24 +191,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // ==============================================================
   // RENDER PRE-WARM SCRIPT (Prevents Cold Starts)
   // ==============================================================
-  useEffect(() => {
+    useEffect(() => {
     const pingBackend = async () => {
       try {
-        // Ping the backend to wake it up silently
-        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://mypath-backend-two.vercel.app';
-        await fetch(`${backendUrl}/ping`, { method: 'GET' });
-        console.log('Backend pre-warmed successfully.');
+        // Ping the Vercel backend to wake it up silently (Cold Start prevention)
+        await fetch('https://mypath-backend-two.vercel.app/ping', { method: 'GET' });
       } catch (err) {
-        // Silently fail if backend is still waking up or unreachable
+        // Ignore ping errors
       }
     };
-
-    // Ping on initial load
     pingBackend();
-
-    // Ping every 10 minutes to keep it awake while the user is actively browsing
-    const intervalId = setInterval(pingBackend, 10 * 60 * 1000);
-    return () => clearInterval(intervalId);
   }, []);
 
   // Firebase Auth Listener with Session Hydration
@@ -175,17 +221,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const data = snap.data();
           setUserProfile({
             ...EMPTY_NEW_PROFILE,
+            ...data,
             uid: firebaseUser.uid,
             name: data?.name || firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split('@')[0] : 'Candidate'),
             email: data?.email || firebaseUser.email || '',
-            username: data?.username || '',
-
+            avatarUrl: data?.avatarUrl || '',
             isProfileComplete: data?.isProfileComplete ?? false,
             isEmailVerified: firebaseUser.emailVerified || data?.isEmailVerified || false,
             authProviders: data?.authProviders || [],
             isOnboarded: data?.isProfileComplete === true,
-          });
-          if (data?.trackerItems) setTrackerItems(data.trackerItems);
+          } as ExtendedUserProfile);
+          // Use saved tracker if exists
+          if (data?.trackerItems && data.trackerItems.length > 0) {
+            setTrackerItems(data.trackerItems);
+          } else {
+            setTrackerItems([]);
+          }
         } else {
           // Document does not exist in Firestore yet
           const name = firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split('@')[0] : 'Candidate');
@@ -194,7 +245,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             uid: firebaseUser.uid,
             name,
             email: firebaseUser.email || '',
-            username: '',
             isProfileComplete: false,
             isEmailVerified: firebaseUser.emailVerified || false,
             authProviders: firebaseUser.providerData ? firebaseUser.providerData.map(p => p.providerId) : [],
@@ -238,7 +288,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const updateUserProfile = async (updated: Partial<ExtendedUserProfile>) => {
     if (currentUser) {
       try {
-        const userRef = doc(db, 'users', currentUser.uid);
+          const targetUid = userProfile?.uid || currentUser.uid;
+          const userRef = doc(db, 'users', targetUid);
         const updatedData = { ...updated, updatedAt: new Date().toISOString() };
         await setDoc(userRef, updatedData, { merge: true });
         setUserProfile(prev => ({ ...prev, ...updatedData }));
@@ -307,38 +358,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         const profile: ExtendedUserProfile = {
           ...EMPTY_NEW_PROFILE,
+          ...userData,
           uid: targetUid,
           name: userData.name || displayName,
           email: userData.email || email,
-          username: userData.username || '',
-
           isProfileComplete: userData.isProfileComplete ?? false,
           isEmailVerified: true,
           authProviders: updatedProviders,
           isOnboarded: userData.isProfileComplete === true,
-        };
+        } as ExtendedUserProfile;
 
         setUserProfile(profile);
         setCurrentUser(res.user);
-
-        if (userData.isProfileComplete === true) {
-          if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem('pendingGoogleUser');
-          navigate('/dashboard');
-        } else {
-          if (typeof sessionStorage !== 'undefined') {
-            sessionStorage.setItem('pendingGoogleUser', JSON.stringify({ uid: targetUid, email, displayName }));
-          }
-          navigate('/complete-profile');
-        }
+        if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem('pendingGoogleUser');
+        navigate('/dashboard');
       } else {
-        // Brand new Google user: must complete profile (TC-F04)
         const newDocData = {
           uid,
           email,
           name: displayName,
-          username: '',
-
-          isProfileComplete: false,
+          isProfileComplete: true,
           isEmailVerified: true,
           authProviders: ['google.com'],
           createdAt: now,
@@ -346,19 +385,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         };
         await setDoc(userRef, newDocData);
 
-        if (typeof sessionStorage !== 'undefined') {
-          sessionStorage.setItem('pendingGoogleUser', JSON.stringify({ uid, email, displayName }));
-        }
-
         const profile: ExtendedUserProfile = {
           ...EMPTY_NEW_PROFILE,
           ...newDocData,
-          isOnboarded: false,
+          isOnboarded: true,
         };
 
         setUserProfile(profile);
         setCurrentUser(res.user);
-        navigate('/complete-profile');
+        navigate('/dashboard');
       }
     }
   };
@@ -395,25 +430,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (snap.exists()) {
         const data = snap.data();
 
-        // Block incomplete Google profiles from email login
-        if (data.isProfileComplete === false) {
-          await signOut(auth);
-          setCurrentUser(null);
-          throw new Error('Email already exists. Please complete your profile to sign in with email.');
-        }
-
         const profile: ExtendedUserProfile = {
           ...EMPTY_NEW_PROFILE,
+          ...data,
           uid: res.user.uid,
           name: data.name || res.user.displayName || normEmail.split('@')[0],
           email: data.email || normEmail,
-          username: data.username || '',
-
-          isProfileComplete: true,
+          avatarUrl: data.avatarUrl || '',
+          isProfileComplete: data.isProfileComplete ?? true,
           isEmailVerified: true,
           authProviders: data.authProviders || ['password'],
-          isOnboarded: true,
-        };
+          isOnboarded: data.isProfileComplete !== false,
+        } as ExtendedUserProfile;
         setUserProfile(profile);
         if (data.trackerItems) setTrackerItems(data.trackerItems);
       } else {
@@ -460,7 +488,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         uid: res.user.uid,
         email: normEmail,
         name: displayName,
-        username: '',
 
         isProfileComplete: true, // Complete for standard email/password signup
         isEmailVerified: false,
@@ -479,73 +506,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  // Complete Google User Profile: Set Password, Age, Name & Reserve Unique Username
-  const completeGoogleProfile = async (data: { name: string; age: number; username: string; password: string }) => {
-    if (!currentUser) throw new Error('No authenticated user found.');
-
-    const normUsername = data.username.trim().toLowerCase();
-    const usernameRef = doc(db, 'usernames', normUsername);
-    const userRef = doc(db, 'users', currentUser.uid);
-
-    // 1. Check if username is already taken (TC-B06, TC-R02)
-    const usernameSnap = await getDoc(usernameRef);
-    if (usernameSnap.exists() && usernameSnap.data()?.uid !== currentUser.uid) {
-      throw new Error('Username is already taken. Please choose another.');
+  // Link Accounts
+  const linkGoogleAccount = async () => {
+    if (!currentUser) return;
+    try {
+      await linkWithPopup(currentUser, googleProvider);
+      const updatedProviders = Array.from(new Set([...(userProfile?.authProviders || []), 'google.com']));
+      const targetUid = userProfile?.uid || currentUser.uid;
+      await setDoc(doc(db, 'users', targetUid), { authProviders: updatedProviders, updatedAt: new Date().toISOString() }, { merge: true });
+      setUserProfile(prev => prev ? { ...prev, authProviders: updatedProviders } : prev);
+      alert('Google account linked successfully!');
+    } catch (error: any) {
+      if (error.code === 'auth/credential-already-in-use') {
+        alert('This Google account is already linked to another user.');
+      } else {
+        alert('Failed to link Google account: ' + error.message);
+      }
     }
-
-    // 2. Set password on the Firebase Auth user for dual authentication (TC-C03)
-    if (data.password) {
-      await updatePassword(currentUser, data.password);
-    }
-
-    const now = new Date().toISOString();
-
-    // 3. Atomically reserve username in Firestore
-    await setDoc(usernameRef, {
-      uid: currentUser.uid,
-      createdAt: now
-    });
-
-    // 4. Update user document
-    const userSnap = await getDoc(userRef);
-    const currentProviders: string[] = userSnap.exists() ? userSnap.data()?.authProviders || [] : [];
-    const updatedProviders = Array.from(new Set([...currentProviders, 'google.com', 'password']));
-
-    const updatedUserDoc = {
-      uid: currentUser.uid,
-      email: (currentUser.email || '').toLowerCase().trim(),
-      name: data.name.trim(),
-      username: normUsername,
-
-      isProfileComplete: true,
-      isEmailVerified: true,
-      authProviders: updatedProviders,
-      updatedAt: now
-    };
-
-    await setDoc(userRef, updatedUserDoc, { merge: true });
-
-    if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.removeItem('pendingGoogleUser');
-    }
-
-    // 5. Update local state and navigate to dashboard
-    setUserProfile(prev => ({
-      ...prev,
-      ...updatedUserDoc,
-      isOnboarded: true
-    }));
-
-    navigate('/dashboard');
   };
 
-  // Check username availability
-  const checkUsernameAvailable = async (username: string): Promise<boolean> => {
-    const norm = username.trim().toLowerCase();
-    if (!norm) return false;
-    const usernameRef = doc(db, 'usernames', norm);
-    const snap = await getDoc(usernameRef);
-    return !snap.exists() || snap.data()?.uid === currentUser?.uid;
+  const linkPasswordAccount = async (password: string) => {
+    if (!currentUser || !currentUser.email) return;
+    try {
+      const credential = EmailAuthProvider.credential(currentUser.email, password);
+      await linkWithCredential(currentUser, credential);
+      const updatedProviders = Array.from(new Set([...(userProfile?.authProviders || []), 'password']));
+      const targetUid = userProfile?.uid || currentUser.uid;
+      await setDoc(doc(db, 'users', targetUid), { authProviders: updatedProviders, updatedAt: new Date().toISOString() }, { merge: true });
+      setUserProfile(prev => prev ? { ...prev, authProviders: updatedProviders } : prev);
+      alert('Password set successfully! You can now log in with email and password.');
+    } catch (error: any) {
+      alert('Failed to set password: ' + error.message);
+    }
   };
 
   // Sign Out User
@@ -563,48 +555,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const deleteAccount = async () => {
     if (!currentUser) return;
     const user = currentUser;
-    const uid = user.uid;
+    const targetUid = userProfile?.uid || user.uid;
 
-    // 1. Resolve username to delete
-    let username = userProfile?.username;
-    if (!username) {
-      try {
-        const snap = await getDoc(doc(db, 'users', uid));
-        if (snap.exists()) {
-          username = snap.data()?.username;
-        }
-      } catch (e) {
-        console.error('Failed to look up username for deletion:', e);
-      }
+    try {
+      // Step 1: Try deleting Auth account FIRST (will fail fast if session is stale)
+      await deleteUser(user);
+
+      // Step 2: Auth succeeded â€” now safely delete Firestore data
+      await deleteDoc(doc(db, 'users', targetUid));
+
+      // Step 3: Teardown session and redirect
+      setCurrentUser(null);
+      setUserProfile(EMPTY_NEW_PROFILE);
+      setTrackerItems([]);
+      localStorage.clear();
+      sessionStorage.clear();
+      navigate('/');
+    } catch (err: any) {
+      console.error('Failed to delete account:', err);
+      alert('session failed. Please log out and log back in, then try again.');
     }
-
-    // 2. Delete user from Firebase Auth FIRST (handles auth/requires-recent-login safely for TC-C05)
-    await deleteUser(user);
-
-    // 3. Cascade deletion to Firestore collections
-    if (username) {
-      await deleteDoc(doc(db, 'usernames', username.toLowerCase()));
-    }
-    await deleteDoc(doc(db, 'users', uid));
-
-    // 4. Teardown session and redirect to landing page
-    setCurrentUser(null);
-    setUserProfile(EMPTY_NEW_PROFILE);
-    setTrackerItems([]);
-    localStorage.clear();
-    sessionStorage.clear();
-    navigate('/');
   };
 
   const toggleBookmark = (examId: string) => {
     setTrackerItems(prev => {
       const existing = prev.find(item => item.examId === examId);
+      let updated: TrackerItem[];
       if (existing) {
-        return prev.filter(item => item.examId !== examId);
+        updated = prev.filter(item => item.examId !== examId);
       } else {
         const targetExam = exams.find(e => e.id === examId);
         if (!targetExam) return prev;
-        return [
+        updated = [
           ...prev,
           {
             id: `t_${Date.now()}`,
@@ -617,26 +599,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
         ];
       }
+      // Persist to Firestore
+      if (currentUser) {
+        const targetUid = userProfile?.uid || currentUser.uid;
+        setDoc(doc(db, 'users', targetUid), { trackerItems: updated, updatedAt: new Date().toISOString() }, { merge: true });
+      }
+      return updated;
     });
   };
 
   const updateTrackerStatus = (trackerId: string, status: ApplicationStatus) => {
-    setTrackerItems(prev =>
-      prev.map(item => (item.id === trackerId ? { ...item, status } : item))
-    );
+    setTrackerItems(prev => {
+      const updated = prev.map(item => (item.id === trackerId ? { ...item, status } : item));
+      if (currentUser) {
+        const targetUid = userProfile?.uid || currentUser.uid;
+        setDoc(doc(db, 'users', targetUid), { trackerItems: updated, updatedAt: new Date().toISOString() }, { merge: true });
+      }
+      return updated;
+    });
   };
 
   const addReminder = (examId: string, date: string) => {
     setTrackerItems(prev => {
       const existing = prev.find(item => item.examId === examId);
+      let updated: TrackerItem[];
       if (existing) {
-        return prev.map(item =>
+        updated = prev.map(item =>
           item.examId === examId ? { ...item, hasReminder: true, reminderDate: date } : item
         );
       } else {
         const targetExam = exams.find(e => e.id === examId);
         if (!targetExam) return prev;
-        return [
+        updated = [
           ...prev,
           {
             id: `t_${Date.now()}`,
@@ -650,15 +644,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
         ];
       }
+      if (currentUser) {
+        const targetUid = userProfile?.uid || currentUser.uid;
+        setDoc(doc(db, 'users', targetUid), { trackerItems: updated, updatedAt: new Date().toISOString() }, { merge: true });
+      }
+      return updated;
     });
   };
 
   const toggleReminder = (trackerId: string) => {
-    setTrackerItems(prev =>
-      prev.map(item =>
+    setTrackerItems(prev => {
+      const updated = prev.map(item =>
         item.id === trackerId ? { ...item, hasReminder: !item.hasReminder } : item
-      )
-    );
+      );
+      if (currentUser) {
+        const targetUid = userProfile?.uid || currentUser.uid;
+        setDoc(doc(db, 'users', targetUid), { trackerItems: updated, updatedAt: new Date().toISOString() }, { merge: true });
+      }
+      return updated;
+    });
   };
 
   const markNotificationRead = (id: string) => {
@@ -747,10 +751,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         loginWithGoogle,
         loginWithEmail,
         signupWithEmail,
-        completeGoogleProfile,
+        linkGoogleAccount,
+        linkPasswordAccount,
         logoutUser,
         deleteAccount,
-        checkUsernameAvailable
       }}
     >
       {children}
@@ -763,3 +767,4 @@ export const useApp = () => {
   if (!context) throw new Error('useApp must be used within an AppProvider');
   return context;
 };
+
