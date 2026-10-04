@@ -216,9 +216,36 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, pageTitl
         })}
       </nav>
 
-      {/* Sign Out */}
-      <div className="sidebar-signout" style={{ padding: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <button
+      {/* Refresh and Sign Out Area */}
+        <div className="sidebar-signout" style={{ padding: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          
+          <button
+            onClick={handleRefresh}
+            title={collapsed ? 'Refresh Dashboard' : undefined}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.8rem',
+              padding: collapsed ? '0.75rem 0' : '0.75rem 1.25rem',
+              borderRadius: '0px',
+              border: 'none',
+              cursor: 'pointer',
+              backgroundColor: 'transparent',
+              color: '#38BDF8',
+              fontWeight: 500,
+              fontSize: '0.9rem',
+              width: '100%',
+              justifyContent: collapsed ? 'center' : 'flex-start',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(56, 189, 248, 0.1)'; }}
+            onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+          >
+            <RefreshCw size={18} />
+            {!collapsed && <span>Refresh Data</span>}
+          </button>
+
+          <button
           onClick={logoutUser}
           title={collapsed ? 'Sign Out' : undefined}
           style={{
@@ -406,8 +433,15 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, pageTitl
           </div>
         </div>
 
-        {/* Sign Out Button */}
-        <div style={{ borderTop: '1px solid #E2E8F0', paddingTop: '1.25rem', marginTop: '0.5rem' }}>
+        {/* Refresh and Sign Out Button */}
+          <div style={{ borderTop: '1px solid #E2E8F0', paddingTop: '1.25rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <button
+              onClick={() => { setAccountTabOpen(false); handleRefresh(); }}
+              style={{ width: '100%', padding: '0.85rem', backgroundColor: '#F0F9FF', color: '#0369A1', border: '1px solid #BAE6FD', borderRadius: '12px', fontWeight: 600, fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+            >
+              <RefreshCw size={18} />
+              Refresh Dashboard
+            </button>
           <button
             onClick={() => { setAccountTabOpen(false); logoutUser(); }}
             style={{ width: '100%', padding: '0.85rem', backgroundColor: '#FEF2F2', color: '#DC2626', border: '1px solid #FECACA', borderRadius: '12px', fontWeight: 600, fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
