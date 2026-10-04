@@ -76,24 +76,45 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, pageTitl
         {!collapsed && (
           <img src={logoImg} alt="MyPath" style={{ height: '56px', objectFit: 'contain' }} />
         )}
-        <button
-          onClick={() => setCollapsed(c => !c)}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '0.4rem',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            color: '#71717A',
-            transition: 'color 0.15s, background 0.15s',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = '#71717A'; e.currentTarget.style.background = 'transparent'; }}
-        >
-          {collapsed ? <ChevronRight size={17} /> : <Menu size={17} />}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+          <button
+            onClick={handleRefresh}
+            title="Refresh Data"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '0.4rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              color: '#71717A',
+              transition: 'color 0.15s, background 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#38BDF8'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = '#71717A'; e.currentTarget.style.background = 'transparent'; }}
+          >
+            <RefreshCw size={17} />
+          </button>
+          <button
+            onClick={() => setCollapsed(c => !c)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '0.4rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              color: '#71717A',
+              transition: 'color 0.15s, background 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = '#71717A'; e.currentTarget.style.background = 'transparent'; }}
+          >
+            {collapsed ? <ChevronRight size={17} /> : <Menu size={17} />}
+          </button>
+        </div>
       </div>
 
       {/* User Avatar Block */}
@@ -216,35 +237,8 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, pageTitl
         })}
       </nav>
 
-      {/* Refresh and Sign Out Area */}
-        <div className="sidebar-signout" style={{ padding: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          
-          <button
-            onClick={handleRefresh}
-            title={collapsed ? 'Refresh Dashboard' : undefined}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.8rem',
-              padding: collapsed ? '0.75rem 0' : '0.75rem 1.25rem',
-              borderRadius: '0px',
-              border: 'none',
-              cursor: 'pointer',
-              backgroundColor: 'transparent',
-              color: '#38BDF8',
-              fontWeight: 500,
-              fontSize: '0.9rem',
-              width: '100%',
-              justifyContent: collapsed ? 'center' : 'flex-start',
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(56, 189, 248, 0.1)'; }}
-            onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-          >
-            <RefreshCw size={18} />
-            {!collapsed && <span>Refresh Data</span>}
-          </button>
-
+      {/* Sign Out */}
+        <div className="sidebar-signout" style={{ padding: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           <button
           onClick={logoutUser}
           title={collapsed ? 'Sign Out' : undefined}
@@ -433,16 +427,9 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, pageTitl
           </div>
         </div>
 
-        {/* Refresh and Sign Out Button */}
-          <div style={{ borderTop: '1px solid #E2E8F0', paddingTop: '1.25rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        {/* Sign Out Button */}
+          <div style={{ borderTop: '1px solid #E2E8F0', paddingTop: '1.25rem', marginTop: '0.5rem' }}>
             <button
-              onClick={() => { setAccountTabOpen(false); handleRefresh(); }}
-              style={{ width: '100%', padding: '0.85rem', backgroundColor: '#F0F9FF', color: '#0369A1', border: '1px solid #BAE6FD', borderRadius: '12px', fontWeight: 600, fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-            >
-              <RefreshCw size={18} />
-              Refresh Dashboard
-            </button>
-          <button
             onClick={() => { setAccountTabOpen(false); logoutUser(); }}
             style={{ width: '100%', padding: '0.85rem', backgroundColor: '#FEF2F2', color: '#DC2626', border: '1px solid #FECACA', borderRadius: '12px', fontWeight: 600, fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
           >
