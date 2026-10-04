@@ -29,6 +29,7 @@ import {
 
 export interface ExtendedUserProfile extends Omit<UserProfile, 'uid'> {
   uid: string;
+  mightBeEligibleExams?: string[];
   isEmailVerified?: boolean;
   isOnboarded?: boolean;
   authProviders?: string[];

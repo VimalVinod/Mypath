@@ -34,10 +34,49 @@ export const DashboardPage: React.FC = () => {
   const maybeEligible = exams.filter(e => e.matchLevel === 'Probably Eligible' && e.daysRemaining > 0);
   const deadlines = trackerItems.filter(t => t.deadlineDate);
   const bookmarks = trackerItems.filter(t => t.status === 'Bookmarked');
+  const unreadCount = notifications.filter(n => n.isUnread).length;
 
-  // ?????? Stat Cards ??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
+  const alerts = notifications.filter(n =>
+    n.reason.includes('Admit') || n.reason.includes('Result') ||
+    n.reason.includes('Deadline') || n.reason.includes('notification') ||
+    n.reason.includes('Answer') || n.reason.includes('declared') ||
+    n.reason.includes('released') || n.reason.includes('Interview') ||
+    n.reason.includes('Scorecard')
+  ).slice(0, 5);
+
+  const trending = exams.filter(e => e.matchLevel !== 'Not Eligible' && (e.tags.includes('trending') || e.tags.includes('upsc'))).slice(0, 5);
+
+  // Calendar
+  const yr = calDate.getFullYear(), mo = calDate.getMonth();
+  const daysInMo = getDaysInMonth(yr, mo);
+  const firstDow = getFirstDayOfMonth(yr, mo);
+  const allEvents = exams.map(e => ({
+    id: e.id, name: e.shortName,
+    deadline: new Date(e.deadlineDate), exam: new Date(e.examDate)
+  }));
+  const calDays: (Date | null)[] = [];
+  for (let i = 0; i < firstDow; i++) calDays.push(null);
+  for (let i = 1; i <= daysInMo; i++) calDays.push(new Date(yr, mo, i));
+  const selEvents = allEvents.filter(e => isSameDay(e.deadline, selDate) || isSameDay(e.exam, selDate));
+
+  // Drag reorder
+  const onDragStart = (e: React.DragEvent, id: string) => e.dataTransfer.setData('text/plain', id);
+  const onDrop = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    setDragOver(null);
+    const src = e.dataTransfer.getData('text/plain');
+    if (src === targetId) return;
+    setWidgetOrder(prev => {
+      const arr = [...prev];
+      const si = arr.indexOf(src), ti = arr.indexOf(targetId);
+      arr.splice(si, 1); arr.splice(ti, 0, src);
+      return arr;
+    });
+  };
+
+  // â”€â”€â”€ Stat Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const stats = [
-    { label: 'Eligible Exams', value: strictlyEligible.length, icon: Target, color: ACCENT, note: maybeEligible.length > 0 ? `+ ${maybeEligible.length} to verify` : 'you qualify for', onClick: () => navigate('/exams') },
+    { label: 'Eligible Exams', value: strictlyEligible.length, icon: Target, color: ACCENT, note: maybeEligible.length > 0 ? '+ ' + maybeEligible.length + ' to verify' : 'you qualify for', onClick: () => navigate('/exams') },
     { label: 'Upcoming Deadlines', value: deadlines.length, icon: Clock4, color: '#DC2626', note: 'in the next 30 days', onClick: () => navigate('/tracker') },
     { label: 'Bookmarked', value: bookmarks.length, icon: BookOpen, color: '#059669', note: 'saved exams', onClick: () => navigate('/tracker') },
     { label: 'Unread Alerts', value: unreadCount, icon: Bell, color: '#D97706', note: 'notifications', onClick: () => navigate('/notifications') },
