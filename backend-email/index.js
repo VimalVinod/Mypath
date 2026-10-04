@@ -51,7 +51,7 @@ app.post('/send-verification', async (req, res) => {
             <td align="center">
               <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden;">
 
-                <!-- Header: WildCode Studios branding (like Spotify header) -->
+                <!-- Header: WildCode Studios branding -->
                 <tr>
                   <td align="center" style="background-color: #000000; padding: 24px 40px;">
                     <img src="https://mypath0.web.app/wildcode-logo.png" alt="WildCode Studios" style="height: 48px; width: auto; display: block; margin: 0 auto;" />
@@ -75,8 +75,6 @@ app.post('/send-verification', async (req, res) => {
                     </a>
                   </td>
                 </tr>
-
-                
 
                 <!-- Footer -->
                 <tr>
@@ -117,15 +115,62 @@ app.post('/send-verification', async (req, res) => {
   }
 });
 
-
 app.post('/send-exam-alerts', async (req, res) => {
   const { email, name, newExams } = req.body;
   if (!email || !newExams || newExams.length === 0) return res.status(400).json({ error: 'Missing data' });
   try {
-    const examListHtml = newExams.map(exam => \<div style='margin-bottom:16px;padding:12px;background:#f9f9f9;border-left:4px solid #000;'><h3 style='margin:0 0 4px;font-size:16px;color:#111;'>\</h3><p style='margin:0;font-size:13px;color:#555;'>Deadline: \</p></div>\).join('');
-    const htmlContent = \<!DOCTYPE html><html><body style='margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif;'><table width='100%' cellpadding='0' cellspacing='0' style='padding:30px 0;'><tr><td align='center'><table width='600' cellpadding='0' cellspacing='0' style='background:#fff;border-radius:8px;overflow:hidden;'><tr><td align='center' style='background:#000;padding:24px 40px;'><img src='https://mypath0.web.app/wildcode-logo.png' alt='WildCode Studios' style='height:48px;' /></td></tr><tr><td align='left' style='padding:48px 40px 32px;'><h1 style='font-size:24px;font-weight:800;color:#111;margin:0 0 16px;'>Good news, \!</h1><p style='font-size:15px;color:#555;margin:0 0 24px;'>You are eligible for <strong>\ new exams</strong>:</p>\<div style='text-align:center;margin-top:32px;'><a href='https://mypath0.web.app/dashboard' style='display:inline-block;padding:15px 36px;background:#000;color:#fff;text-decoration:none;font-weight:bold;border-radius:4px;'>VIEW DASHBOARD</a></div></td></tr></table></td></tr></table></body></html>\;
+    const examListHtml = newExams.map(exam => `<div style='margin-bottom:16px;padding:12px;background:#f9f9f9;border-left:4px solid #000;'><h3 style='margin:0 0 4px;font-size:16px;color:#111;'>${exam.title || exam.examName}</h3><p style='margin:0;font-size:13px;color:#555;'>Deadline: ${exam.applicationEndDate || exam.importantDates?.applicationEndDate || 'N/A'}</p></div>`).join('');
+    
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 30px 0;">
+          <tr>
+            <td align="center">
+              <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden;">
+                <tr>
+                  <td align="center" style="background-color: #000000; padding: 24px 40px;">
+                    <img src="https://mypath0.web.app/wildcode-logo.png" alt="WildCode Studios" style="height: 48px; width: auto; display: block; margin: 0 auto;" />
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left" style="padding: 48px 40px 32px;">
+                    <h1 style="font-size: 24px; font-weight: 800; color: #111111; margin: 0 0 16px;">Good news, ${name || 'User'}!</h1>
+                    <p style="font-size: 15px; color: #555555; line-height: 1.6; margin: 0 0 24px;">
+                      You are eligible for <strong>${newExams.length} new exams</strong> based on your MyPath profile:
+                    </p>
+                    
+                    ${examListHtml}
+                    
+                    <div style="text-align: center; margin-top: 32px;">
+                      <a href="https://mypath0.web.app/dashboard" style="display: inline-block; padding: 15px 36px; background-color: #000000; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: bold; border-radius: 4px; text-transform: uppercase;">
+                        VIEW DASHBOARD
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                
+                <!-- Footer -->
+                <tr>
+                  <td align="center" style="background-color: #000000; padding: 24px 40px; border-top: none;">
+                    <img src="https://mypath0.web.app/wildcode-logo.png" alt="WildCode Studios" style="height: 28px; width: auto; opacity: 0.5; margin-bottom: 10px;" />
+                    <p style="font-size: 11px; color: #bbbbbb; margin: 0;">
+                      MyPath is a product of WildCode Studios &bull; wildcodestudios.in
+                    </p>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+
     const senderEmail = process.env.SENDER_EMAIL || 'MyPath Team <noreply@wildcodestudios.in>';
-    const { data, error } = await resend.emails.send({ from: senderEmail, to: [email], subject: \You are eligible for \ new exam(s)!\, html: htmlContent });
+    const { data, error } = await resend.emails.send({ from: senderEmail, to: [email], subject: `You are eligible for ${newExams.length} new exam(s)!`, html: htmlContent });
     if (error) throw error;
     res.status(200).json({ success: true, data });
   } catch (error) {
@@ -135,7 +180,6 @@ app.post('/send-exam-alerts', async (req, res) => {
 });
 
 // Export the app for Vercel Serverless Functions
-// --- ELIGIBILITY MATH (Copied from main backend) ---
 module.exports = app;
 
 const PORT = process.env.PORT || 10000;
@@ -144,8 +188,3 @@ if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
     console.log(`Backend server running on port ${PORT}`);
   });
 }
-
-
-
-
-
