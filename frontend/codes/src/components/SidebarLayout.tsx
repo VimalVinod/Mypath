@@ -49,7 +49,7 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, pageTitl
     alert("Your page will be refreshing in a couple of seconds...");
     try {
       // Hit the Vercel backend to force a sync
-      await fetch("https://mypath-backend-two.vercel.app/match-user", {
+      await fetch("https://mypath-hub.vercel.app/match-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: currentUser?.uid })

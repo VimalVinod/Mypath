@@ -30,6 +30,7 @@ import {
 export interface ExtendedUserProfile extends Omit<UserProfile, 'uid'> {
   uid: string;
   mightBeEligibleExams?: string[];
+  isProfileComplete?: boolean;
   isEmailVerified?: boolean;
   isOnboarded?: boolean;
   authProviders?: string[];
@@ -199,7 +200,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const pingBackend = async () => {
       try {
         // Ping the Vercel backend to wake it up silently (Cold Start prevention)
-        await fetch('https://mypath-backend-two.vercel.app/ping', { method: 'GET' });
+        await fetch('https://mypath-hub.vercel.app/ping', { method: 'GET' });
       } catch (err) {
         // Ignore ping errors
       }
@@ -412,7 +413,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (res.user) {
       // Step 2: Block unverified emails
       if (!res.user.emailVerified) {
-        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://mypath-backend-two.vercel.app';
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://mypath-hub.vercel.app';
         try {
           await fetch(`${backendUrl}/send-verification`, {
             method: 'POST',
@@ -473,7 +474,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const res = await createUserWithEmailAndPassword(auth, normEmail, pass);
     if (res.user) {
       // Instead of default Firebase email, call our custom Render backend
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://mypath-backend-two.vercel.app';
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://mypath-hub.vercel.app';
       try {
         await fetch(`${backendUrl}/send-verification`, {
           method: 'POST',
