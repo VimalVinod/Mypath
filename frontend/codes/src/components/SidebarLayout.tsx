@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { checkEligibility } from '../eligibility';
 import {
   LayoutDashboard, Search, ListChecks, User, Bell, BookOpen,
   LogOut, ChevronRight, Menu, X, RefreshCw
@@ -34,7 +35,7 @@ const NAV_ITEMS = [
 ];
 
 export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, pageTitle, activeNav }) => {
-  const { navigate, userProfile, currentUser, logoutUser, unreadNotificationCount, updateUserProfile, linkGoogleAccount, linkPasswordAccount } = useApp();
+  const { navigate, userProfile, currentUser, logoutUser, unreadNotificationCount, updateUserProfile, linkGoogleAccount, linkPasswordAccount, exams } = useApp();
   const [collapsed, setCollapsed] = useState(false);
   const [accountTabOpen, setAccountTabOpen] = useState(false);
   const [newPassword, setNewPassword] = useState('');
@@ -49,11 +50,14 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, pageTitl
     alert("Your page will be refreshing in a couple of seconds...");
     try {
       // Hit the Vercel backend to force a sync
-      await fetch("https://mypath-hub.vercel.app/match-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: currentUser?.uid })
-      });
+      const eligibleHashes: string[] = [];
+        const mightBeEligibleHashes: string[] = [];
+        exams.forEach(exam => {
+          const { eligible } = checkEligibility(userProfile, (exam as any).eligibilityBreakdown || (exam as any).eligibility || {});
+          if (eligible === true) eligibleHashes.push(exam.id);
+          else if (eligible === 'maybe') mightBeEligibleHashes.push(exam.id);
+        });
+        await updateUserProfile({ eligibleExams: eligibleHashes, mightBeEligibleExams: mightBeEligibleHashes });
       // Force reload the dashboard
       window.location.reload();
     } catch (e) {

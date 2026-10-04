@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
+import { checkEligibility } from '../eligibility';
 import { SidebarLayout } from '../components/SidebarLayout';
 import { User, MapPin, GraduationCap, Briefcase, Users, Save, Plus, X, ShieldAlert } from 'lucide-react';
 import { statesAndDistricts } from '../data/statesAndDistricts';
@@ -18,7 +19,7 @@ const EDUCATION_STREAMS: Record<string, string[]> = {
 
 
 export const ProfilePage: React.FC = () => {
-  const { currentUser, userProfile, updateUserProfile, navigate, logoutUser, deleteAccount, linkGoogleAccount, linkPasswordAccount } = useApp();
+  const { currentUser, userProfile, updateUserProfile, navigate, logoutUser, deleteAccount, linkGoogleAccount, linkPasswordAccount, exams } = useApp();
   const [newPassword, setNewPassword] = useState('');
   
   const [isSaving, setIsSaving] = useState(false);
@@ -133,11 +134,18 @@ export const ProfilePage: React.FC = () => {
       // INSTANT MATCH - Real-time sync with backend!
       if (currentUser?.uid) {
         try {
-          await fetch('https://mypath-hub.vercel.app/match-user', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: currentUser?.uid })
+          const eligibleHashes: string[] = [];
+          const mightBeEligibleHashes: string[] = [];
+          
+          const profileForCheck = { ...userProfile, ...profileDataToSave };
+          
+          exams.forEach(exam => {
+            const { eligible } = checkEligibility(profileForCheck, (exam as any).eligibilityBreakdown || (exam as any).eligibility || {});
+            if (eligible === true) eligibleHashes.push(exam.id);
+            else if (eligible === 'maybe') mightBeEligibleHashes.push(exam.id);
           });
+          
+          await updateUserProfile({ eligibleExams: eligibleHashes, mightBeEligibleExams: mightBeEligibleHashes });
         } catch (e) {
           console.warn('Silent fallback: Could not reach matching service immediately.');
         }

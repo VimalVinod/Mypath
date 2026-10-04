@@ -1,0 +1,438 @@
+/**
+ * ==============================================================================
+ * CENTRAL RESPONSIVE STYLESHEET (src/styles/responsive.css)
+ * ==============================================================================
+ * Authoritative responsive stylesheet for MyPath.
+ * Consolidated from mobile.css and responsive.css into a single central stylesheet.
+ * Imported in src/main.tsx AFTER theme.css to guarantee cascade precedence.
+ *
+ * ARCHITECTURAL CONTRACT:
+ * 1. STRICT MEDIA QUERY PARTITIONING:
+ *    - Every CSS rule MUST reside inside a @media query block.
+ *    - ZERO rules outside media queries.
+ *    - Desktop (>1024px) has strictly ZERO rule activation (100% pixel-identical).
+ * 2. SCOPED !important:
+ *    - Used exclusively to override existing inline React styles where necessary.
+ * 3. MOBILE-FIRST CASCADE PRECEDENCE:
+ *    - Section 1: Tablet       (@media screen and (max-width: 1024px))
+ *    - Section 2: Mobile       (@media screen and (max-width: 768px))
+ *    - Section 3: Small Mobile (@media screen and (max-width: 480px))
+ * ==============================================================================
+ */
+
+/* ==============================================================================
+   SECTION 1: TABLET OVERRIDES (max-width: 1024px)
+   ============================================================================== */
+@media screen and (max-width: 1024px) {
+  /* Dashboard Stats Grid — 2x2 on tablet */
+  .dashboard-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ==============================================================================
+   SECTION 2: MOBILE OVERRIDES (max-width: 768px)
+   ============================================================================== */
+@media screen and (max-width: 768px) {
+  /* ----------------------------------------------------------------------------
+     2.1 Global Reset, Containers & Layout Boundary
+     ---------------------------------------------------------------------------- */
+  html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+
+  .container {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.2 Typography Scaling
+     ---------------------------------------------------------------------------- */
+  h1 {
+    font-size: 2.25rem !important;
+    line-height: 1.2 !important;
+  }
+
+  h2 {
+    font-size: 1.85rem !important;
+    line-height: 1.25 !important;
+  }
+
+  h3 {
+    font-size: 1.5rem !important;
+  }
+
+  p {
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+  }
+
+  section {
+    padding: 3rem 0 !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.3 Public Header & Navigation (Migrated from mobile.css)
+     ---------------------------------------------------------------------------- */
+  nav, .navbar {
+    padding: 0.5rem 0 !important;
+  }
+
+  .nav-container {
+    padding: 0 1rem !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+
+  .nav-container > div:first-child {
+    gap: 1rem !important;
+  }
+
+  .navbar-brand-logo {
+    height: 32px !important;
+  }
+
+  .nav-links {
+    display: none !important;
+  }
+
+  .nav-auth-desktop {
+    gap: 0.5rem !important;
+  }
+
+  .nav-auth-desktop .btn {
+    padding: 0.4rem 0.6rem !important;
+    font-size: 0.75rem !important;
+    width: auto !important;
+    white-space: nowrap !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.4 App Shell: Sidebar to Fixed Bottom Navigation Transformation
+     ---------------------------------------------------------------------------- */
+  .app-container {
+    flex-direction: column !important;
+  }
+
+  /* Transform sticky vertical sidebar into fixed bottom navigation bar */
+  .sidebar-container {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    position: fixed !important;
+    top: auto !important; /* CRITICAL: overrides inline top: 0 to prevent viewport stretch */
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 50 !important;
+    flex-direction: row !important;
+    border-right: none !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background-color: #121212 !important;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  /* Inner wrapper inside sidebar */
+  .sidebar-container > div {
+    width: 100% !important;
+    height: auto !important;
+    flex-direction: row !important;
+  }
+
+  /* Hide desktop-only sidebar chrome */
+  .sidebar-logo-area,
+  .sidebar-profile-area,
+  .sidebar-signout,
+  .sidebar-nav-header {
+    display: none !important;
+  }
+
+  /* Horizontal bottom navigation row */
+  .sidebar-nav {
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    padding: 0.35rem 0.2rem !important;
+    width: 100% !important;
+    gap: 0.15rem !important;
+  }
+
+  /* Bottom nav tab item buttons */
+  .sidebar-nav-btn {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    width: auto !important;
+    flex-direction: column !important;
+    padding: 0.35rem 0.15rem !important;
+    gap: 0.2rem !important;
+    font-size: 0.68rem !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    border-radius: 6px !important;
+    position: relative !important;
+  }
+
+  .sidebar-nav-btn > span {
+    font-size: 0.62rem !important;
+    display: block !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.5 Main Content Container & Header Scaling
+     ---------------------------------------------------------------------------- */
+  .main-content {
+    padding-bottom: 70px !important; /* Bottom clearance for 60px fixed bottom nav */
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .main-body {
+    padding: 1.25rem 1rem !important;
+    padding-bottom: 70px !important;
+  }
+
+  .main-header {
+    padding: 0 1rem !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.6 Shared Overlays: Cookie Banner & Profile Picker Modal
+     ---------------------------------------------------------------------------- */
+  .cookie-consent-banner {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
+    padding: 1rem !important;
+    bottom: 60px !important; /* Clears fixed bottom nav on mobile */
+  }
+
+  .cookie-consent-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+
+  .cookie-consent-actions button {
+    flex: 1 !important;
+  }
+
+  .profile-picker-modal {
+    width: 92vw !important;
+    max-width: 92vw !important;
+    padding: 1.25rem 1rem !important;
+  }
+
+  .profile-picker-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.7 Hero, Carousel Controls & Landing Page Features (Migrated from mobile.css)
+     ---------------------------------------------------------------------------- */
+  .hero-section {
+    padding-top: 0.5rem !important;
+    padding-bottom: 1rem !important;
+    text-align: center !important;
+  }
+
+  .hero-banner-container {
+    border-radius: 8px !important;
+    height: auto !important;
+    aspect-ratio: 3008 / 1408 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  .hero-banner-container img {
+    object-fit: cover !important;
+  }
+
+  .carousel-arrow {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .carousel-arrow svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .carousel-arrow-left {
+    left: 10px !important;
+  }
+
+  .carousel-arrow-right {
+    right: 10px !important;
+  }
+
+  .carousel-dots-container {
+    bottom: 10px !important;
+    padding: 4px 10px !important;
+    gap: 6px !important;
+  }
+
+  .carousel-dot {
+    height: 6px !important;
+  }
+
+  .carousel-dot[style*="width: 30px"] {
+    width: 16px !important;
+  }
+
+  .carousel-dot[style*="width: 8px"] {
+    width: 6px !important;
+  }
+
+  .feature-section {
+    padding: 4rem 0 !important;
+  }
+
+  .feature-flex {
+    display: flex !important;
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 2rem !important;
+  }
+
+  .feature-reverse {
+    flex-direction: column-reverse !important;
+  }
+
+  .feature-text-block {
+    width: 100% !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .feature-heading {
+    font-size: 2rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .feature-description {
+    font-size: 1.05rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .feature-image-block {
+    width: 100% !important;
+  }
+
+  .feature-image-block > div {
+    max-width: 100% !important;
+    border-radius: 16px !important;
+    aspect-ratio: 4/3 !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.8 Form Controls (Migrated from mobile.css)
+     ---------------------------------------------------------------------------- */
+  .form-group {
+    margin-bottom: 1rem !important;
+  }
+
+  .form-input {
+    padding: 0.6rem 0.8rem !important;
+    font-size: 1rem !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.9 Public Footer (Migrated from mobile.css)
+     ---------------------------------------------------------------------------- */
+  footer {
+    padding: 2.5rem 0 !important;
+    margin-top: 3rem !important;
+    text-align: center !important;
+  }
+
+  footer .container {
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  footer img {
+    margin: 0 auto 1rem auto !important;
+  }
+
+  footer a {
+    font-size: 0.85rem !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.10 Dashboard, Profile & Tracker Page Elements
+     ---------------------------------------------------------------------------- */
+  .dashboard-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+
+  .stat-card {
+    padding: 1rem 0.75rem !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 0.5rem !important;
+  }
+
+  .profile-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .tracker-table-row {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  .tracker-table-row > span {
+    display: none !important;
+  }
+}
+
+/* ==============================================================================
+   SECTION 3: SMALL MOBILE REFINEMENTS (max-width: 480px)
+   ============================================================================== */
+@media screen and (max-width: 480px) {
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  h1 {
+    font-size: 1.95rem !important;
+  }
+
+  h2 {
+    font-size: 1.6rem !important;
+  }
+
+  .sidebar-nav-btn {
+    padding: 0.3rem 0.1rem !important;
+  }
+
+  .sidebar-nav-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .sidebar-nav-btn > span {
+    font-size: 0.58rem !important;
+  }
+
+  .cookie-consent-actions {
+    flex-direction: column !important;
+  }
+}

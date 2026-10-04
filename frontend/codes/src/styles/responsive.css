@@ -1,0 +1,1000 @@
+/**
+ * ==============================================================================
+ * CENTRAL RESPONSIVE STYLESHEET (src/styles/responsive.css)
+ * ==============================================================================
+ * Authoritative responsive stylesheet for MyPath.
+ * Consolidated from mobile.css and responsive.css into a single central stylesheet.
+ * Imported in src/main.tsx AFTER theme.css to guarantee cascade precedence.
+ *
+ * ARCHITECTURAL CONTRACT:
+ * 1. STRICT MEDIA QUERY PARTITIONING:
+ *    - Every CSS rule MUST reside inside a @media query block.
+ *    - ZERO rules outside media queries.
+ *    - Desktop (>1024px) has strictly ZERO rule activation (100% pixel-identical).
+ * 2. SCOPED !important:
+ *    - Used exclusively to override existing inline React styles where necessary.
+ * 3. MOBILE-FIRST CASCADE PRECEDENCE:
+ *    - Section 1: Tablet       (@media screen and (min-width: 769px) and (max-width: 1024px))
+ *    - Section 2: Mobile       (@media screen and (max-width: 768px))
+ *    - Section 3: Small Mobile (@media screen and (max-width: 480px))
+ * ==============================================================================
+ */
+
+/* ==============================================================================
+   SECTION 1: TABLET OVERRIDES (769px - 1024px)
+   ============================================================================== */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  /* Prevent sidebar squeeze on tablet portrait */
+  .sidebar-container {
+    width: 200px !important;
+    min-width: 200px !important;
+  }
+
+  .main-header {
+    padding: 0 1.5rem !important;
+  }
+
+  .main-body {
+    padding: 1.5rem !important;
+  }
+
+  /* Dashboard Stats Grid — 2x2 on tablet */
+  .dashboard-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .nav-container {
+    padding: 0 1.5rem !important;
+  }
+}
+
+/* ==============================================================================
+   SECTION 2: MOBILE OVERRIDES (max-width: 768px)
+   ============================================================================== */
+@media screen and (max-width: 768px) {
+
+  /* Remove unwanted vertical spaces between sections */
+  .feature-section {
+    padding: 2.5rem 0 1.5rem !important;
+  }
+  .feature-flex {
+    gap: 2rem !important;
+  }
+
+
+  /* Hide carousel arrows on mobile */
+  .carousel-arrow {
+    display: none !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.1 Global Viewport Reset, Containers & Layout Boundary
+     ---------------------------------------------------------------------------- */
+  html, body {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  .container {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.2 Typography Scaling
+     ---------------------------------------------------------------------------- */
+  
+
+  
+
+  
+
+  
+
+  
+
+  /* ----------------------------------------------------------------------------
+     2.3 Public Header & Navigation (Migrated from mobile.css)
+     ---------------------------------------------------------------------------- */
+  nav, .navbar {
+    height: 80px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  .nav-container {
+    padding: 0 1rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .nav-container > div:first-child {
+    gap: 0.75rem !important;
+  }
+
+  .navbar-brand-logo {
+    height: 42px !important;
+    width: auto !important;
+  }
+
+  .nav-links {
+    display: none !important;
+  }
+
+  .nav-auth-desktop .btn {
+    padding: 0.35rem 0.65rem !important;
+    font-size: 0.65rem !important;
+    line-height: 1.2 !important;
+    width: auto !important;
+    white-space: nowrap !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.4 App Shell: Sidebar to Fixed Bottom Navigation Transformation
+     ---------------------------------------------------------------------------- */
+  .app-container {
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 100dvh !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Transform sticky vertical sidebar into fixed bottom navigation bar */
+  .sidebar-container {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: auto !important;
+      min-height: 85px !important;
+    max-height: none !important;
+    position: fixed !important;
+    top: auto !important; /* CRITICAL: overrides inline top: 0 to prevent viewport stretch */
+    bottom: 0 !important;
+      
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 60 !important;
+    flex-direction: row !important;
+    border-right: none !important;
+    border-top: none !important;
+    background-color: #121212 !important;
+    border-radius: 20px 20px 0 0 !important;
+    
+    overflow: visible !important;
+  }
+
+  /* Inner wrapper inside sidebar */
+  .sidebar-inner,
+  .sidebar-container > div {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    height: auto !important;
+      min-height: 85px !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+  }
+
+  /* Hide desktop-only sidebar chrome */
+  .sidebar-logo-area,
+  .sidebar-profile-area,
+  .sidebar-signout,
+  .sidebar-nav-header {
+    display: none !important;
+  }
+
+  /* Horizontal bottom navigation rail */
+  .sidebar-nav {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    width: 100% !important;
+    height: 60px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    gap: 0 !important;
+  }
+
+  /* Navigation Buttons: 6 equal touch targets with vertical icon+label layout */
+  .sidebar-nav-btn {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0.35rem 0.1rem !important;
+    gap: 0.2rem !important;
+    text-align: center !important;
+    position: relative !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Button Icons */
+  .sidebar-nav-btn > svg {
+    flex-shrink: 0 !important;
+  }
+
+  /* Button Labels: truncated text preventing overflow */
+  .sidebar-nav-label,
+  .sidebar-nav-btn > span:not([style*="borderRadius"]):not(.sidebar-nav-badge) {
+    font-size: 0.625rem !important; /* 10px */
+    line-height: 1.1 !important;
+    font-weight: 500 !important;
+    display: block !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+    text-align: center !important;
+  }
+
+  /* Unread Notification Badge: anchored to top-right of bell icon */
+  .sidebar-nav-badge,
+  .sidebar-nav-btn span[style*="borderRadius"] {
+    position: absolute !important;
+    top: 4px !important;
+    right: calc(50% - 18px) !important;
+    font-size: 0.55rem !important;
+    padding: 0.05rem 0.3rem !important;
+    min-width: 14px !important;
+    height: 14px !important;
+    line-height: 14px !important;
+    z-index: 2 !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.5 Main Area: 70px Bottom Clearance & Header Scaling
+     ---------------------------------------------------------------------------- */
+  .main-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important; /* Clears 60px fixed bottom nav */
+  }
+
+  .main-body {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 1.25rem 1rem calc(100px + env(safe-area-inset-bottom, 0px)) 1rem !important; /* Clears 85px fixed bottom nav */
+    overflow-x: hidden !important;
+  }
+
+
+  .main-header {
+    height: 50px !important;
+    padding: 0 1rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.6 Shared Overlays: Cookie Banner & Profile Picker Modal
+     ---------------------------------------------------------------------------- */
+  .cookie-consent-banner {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 1rem 1.25rem !important;
+    gap: 0.75rem !important;
+    box-sizing: border-box !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Clear bottom navigation bar on authenticated views */
+  body:has(.sidebar-container) .cookie-consent-banner,
+  body:has(.app-container) .cookie-consent-banner {
+    bottom: 68px !important;
+  }
+
+  .cookie-consent-text {
+    margin-right: 0 !important;
+    font-size: 0.82rem !important;
+    line-height: 1.45 !important;
+    text-align: left !important;
+  }
+
+  .cookie-consent-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0.5rem !important;
+  }
+
+  .cookie-consent-actions button,
+  .cookie-consent-btn {
+    width: 100% !important;
+    padding: 0.6rem 1rem !important;
+    font-size: 0.85rem !important;
+    text-align: center !important;
+    justify-content: center !important;
+    display: flex !important;
+    align-items: center !important;
+    min-height: 40px !important;
+    border-radius: 6px !important;
+  }
+
+  .profile-picker-modal {
+    width: 92vw !important;
+    max-width: 360px !important;
+    padding: 1.25rem 1rem !important;
+    box-sizing: border-box !important;
+    border-radius: 14px !important;
+    gap: 0.85rem !important;
+  }
+
+  .profile-picker-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.5rem !important;
+    justify-items: center !important;
+    padding: 0.25rem 0 !important;
+  }
+
+  .profile-picker-avatar-btn,
+  .profile-picker-grid button {
+    width: 52px !important;
+    height: 52px !important;
+  }
+
+  .profile-picker-close-btn {
+    padding: 0.4rem !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.7 Hero, Carousel Controls & Landing Page Features (Migrated from mobile.css)
+     ---------------------------------------------------------------------------- */
+
+  /* Show/hide active opps sections by screen size */
+  .desktop-active-opps {
+    display: none !important;
+  }
+
+  .mobile-active-opps {
+    display: block !important;
+  }
+
+
+  .hero-banner-wrapper {
+    width: calc(100% - 1rem) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 -20px 40px -10px var(--dynamic-glow), 0 20px 40px -10px var(--dynamic-glow) !important;
+  }
+
+  .hero-banner-container {
+    border-radius: 24px !important;
+    height: auto !important;
+      min-height: 85px !important;
+    aspect-ratio: 3008 / 1408 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  .hero-banner-container img {
+    object-fit: cover !important;
+  }
+
+  .carousel-arrow {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .carousel-arrow svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .carousel-arrow-left {
+    left: 10px !important;
+  }
+
+  .carousel-arrow-right {
+    right: 10px !important;
+  }
+
+  .carousel-dots-container {
+    bottom: 10px !important;
+    padding: 4px 10px !important;
+    gap: 6px !important;
+  }
+
+  .carousel-dot {
+    height: 6px !important;
+  }
+
+  .carousel-dot[style*="width: 30px"] {
+    width: 16px !important;
+  }
+
+  .carousel-dot[style*="width: 8px"] {
+    width: 6px !important;
+  }
+
+  .feature-flex {
+    display: flex !important;
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 2rem !important;
+  }
+
+  .feature-reverse {
+    flex-direction: column-reverse !important;
+  }
+
+  .feature-text-block {
+    width: 100% !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .feature-heading {
+    font-size: 2rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .feature-description {
+    font-size: 1.05rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .feature-image-block {
+    width: 100% !important;
+  }
+
+  .feature-image-block > div {
+    max-width: 100% !important;
+    border-radius: 16px !important;
+    aspect-ratio: 4/3 !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.8 Form Controls (Migrated from mobile.css)
+     ---------------------------------------------------------------------------- */
+  .form-group {
+    margin-bottom: 1rem !important;
+  }
+
+  .form-input {
+    padding: 0.6rem 0.8rem !important;
+    font-size: 1rem !important;
+  }
+
+
+  /* ----------------------------------------------------------------------------
+     2.9 Public Footer (Migrated from mobile.css & Enhanced)
+     ---------------------------------------------------------------------------- */
+  footer, .app-footer {
+    padding: 2.5rem 0 1.5rem !important;
+    margin-top: 0 !important;
+    text-align: center !important;
+  }
+
+  footer .container,
+  .footer-container {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 1.75rem !important;
+    text-align: center !important;
+  }
+
+  .footer-col,
+  footer .container > div {
+    max-width: 100% !important;
+    width: 100% !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  footer img {
+    margin: 0 auto 0.75rem auto !important;
+  }
+
+  footer a {
+    font-size: 0.85rem !important;
+    padding: 0.35rem 0 !important;
+    display: inline-block !important;
+    min-height: 32px !important;
+  }
+
+  /* ----------------------------------------------------------------------------
+     2.10 Dashboard, Profile & Tracker Page Elements
+     ---------------------------------------------------------------------------- */
+  .dashboard-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+
+  .stat-card {
+    padding: 0.8rem 0.5rem !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 0.35rem !important;
+  }
+
+  /* Incomplete Profile Banner (Feature 9) */
+  .dashboard-banner {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 1rem 1.25rem !important;
+    gap: 0.875rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .dashboard-banner-content {
+    width: 100% !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  .dashboard-banner-content > div:first-child {
+    flex-shrink: 0 !important;
+  }
+
+  .dashboard-banner-content > div:last-child {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .dashboard-banner-btn {
+    width: 100% !important;
+    text-align: center !important;
+    justify-content: center !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0.65rem 1rem !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Upcoming Deadlines Card (Feature 10) */
+  .dashboard-deadlines-card,
+  .deadlines-card {
+    padding: 1rem !important;
+  }
+
+  .deadline-item {
+    padding: 0.75rem 0.875rem !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+  }
+
+  .deadline-item > div:first-child {
+    min-width: 0 !important;
+    flex: 1 1 180px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .deadline-item > div:last-child {
+    flex-shrink: 0 !important;
+    text-align: right !important;
+  }
+
+  /* Empty State Card & Button (Feature 10) */
+  .dashboard-empty-card {
+    padding: 1.75rem 1.25rem !important;
+  }
+
+  .dashboard-empty-btn {
+    min-height: 42px !important;
+    padding: 0.65rem 1.25rem !important;
+    justify-content: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .profile-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .tracker-table-row {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  .tracker-table-row > span {
+    display: none !important;
+  }
+}
+
+/* ==============================================================================
+   SECTION 3: SMALL MOBILE REFINEMENTS (max-width: 480px)
+   ============================================================================== */
+@media screen and (max-width: 480px) {
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  
+
+  
+
+  .nav-container {
+    padding: 0 0.75rem !important;
+  }
+
+  .navbar-brand-logo {
+    height: 36px !important;
+  }
+
+  .nav-auth-desktop .btn {
+    padding: 0.3rem 0.55rem !important;
+    font-size: 0.65rem !important;
+  }
+
+  .sidebar-nav-btn {
+    padding: 0.25rem 0.05rem !important;
+    gap: 0.15rem !important;
+  }
+
+  .sidebar-nav-btn > svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .sidebar-nav-label,
+  .sidebar-nav-btn > span:not([style*="borderRadius"]):not(.sidebar-nav-badge) {
+    font-size: 0.55rem !important; /* ~9px */
+    max-width: 50px !important;
+  }
+
+  .main-header {
+    padding: 0 0.75rem !important;
+    height: 48px !important;
+  }
+
+  .main-body {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .profile-picker-modal {
+    width: 94vw !important;
+    padding: 1rem 0.75rem !important;
+  }
+
+  .profile-picker-avatar-btn,
+  .profile-picker-grid button {
+    width: 46px !important;
+    height: 46px !important;
+  }
+
+  .profile-picker-grid {
+    gap: 0.35rem !important;
+  }
+
+  .cookie-consent-banner {
+    padding: 0.75rem 0.875rem !important;
+  }
+
+  .cookie-consent-text {
+    font-size: 0.78rem !important;
+  }
+
+  .cookie-consent-actions {
+    flex-direction: column !important;
+  }
+
+  /* Dashboard Incomplete Profile Banner (Feature 9) */
+  .dashboard-banner {
+    padding: 0.875rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .dashboard-banner-btn {
+    font-size: 0.85rem !important;
+    padding: 0.6rem 0.875rem !important;
+  }
+
+  /* Dashboard Upcoming Deadlines Card (Feature 10) */
+  .dashboard-deadlines-card,
+  .deadlines-card {
+    padding: 0.875rem 0.75rem !important;
+  }
+
+  .deadline-item {
+    padding: 0.65rem 0.75rem !important;
+    gap: 0.4rem !important;
+  }
+
+  /* Dashboard Empty State (Feature 10) */
+  .dashboard-empty-card {
+    padding: 1.5rem 0.75rem !important;
+  }
+
+  .dashboard-empty-btn {
+    width: 100% !important;
+    max-width: 280px !important;
+    min-height: 44px !important;
+    font-size: 0.82rem !important;
+    padding: 0.65rem 1rem !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .profile-form-section {
+    padding: 1.25rem !important;
+  }
+}
+@media screen and (max-width: 480px) {
+  .profile-form-section {
+    padding: 1rem !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .stat-card > div:last-child > div:first-child {
+    font-size: 1.25rem !important;
+  }
+  .stat-card > div:last-child > div:last-child {
+    font-size: 0.6rem !important;
+    white-space: normal !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .btn {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.8rem !important;
+  }
+  .form-input, .form-select, .form-textarea {
+    padding: 0.5rem 0.8rem !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .btn {
+    padding: 0.45rem 0.8rem !important;
+    font-size: 0.65rem !important;
+  }
+  .form-input, .form-select, .form-textarea {
+    padding: 0.45rem 0.75rem !important;
+    font-size: 0.8rem !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  /* Override inline active background/color */
+  .sidebar-nav-btn {
+    background-color: transparent !important;
+    color: #A1A1AA !important;
+  }
+  
+  .sidebar-nav-btn svg {
+    color: #A1A1AA !important;
+  }
+
+  .sidebar-nav-btn.active {
+    color: #FFFFFF !important;
+  }
+  
+  .sidebar-nav-btn.active svg {
+    color: #FFFFFF !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  /* Clean White Bottom Navbar */
+  .sidebar-container {
+    background-color: #121212 !important;
+    border-radius: 20px 20px 0 0 !important;
+    border-top: none !important;
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05) !important;
+    
+  }
+
+  /* Make the container actually hold the buttons properly */
+  .sidebar-nav {
+    height: calc(54px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: 0 0 env(safe-area-inset-bottom, 0px) 0 !important;
+    background: transparent !important;
+    align-items: center !important;
+  }
+
+  /* Inactive State: Gray, No Background */
+  .sidebar-nav-btn {
+    background-color: transparent !important;
+    color: #A1A1AA !important;
+    padding: 0.25rem 0.1rem !important;
+    gap: 0.25rem !important;
+  }
+  
+  .sidebar-nav-btn svg {
+    color: #A1A1AA !important;
+    stroke: #A1A1AA !important;
+    width: 28px !important;
+    height: 28px !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  }
+
+  /* Active State: Theme Green */
+  .sidebar-nav-btn.active {
+    color: #FFFFFF !important;
+    background-color: transparent !important;
+  }
+  
+  
+  .sidebar-nav-btn.active svg {
+    color: #FFFFFF !important;
+    stroke: #FFFFFF !important;
+      fill: #FFFFFF !important;
+      stroke-width: 2.5px !important;
+    transform: scale(1.2) translateY(-2px) !important;
+    
+  }
+
+  
+  
+  /* Make main header look like a clean top navbar on mobile */
+  .main-header {
+    height: 80px !important;
+    background-color: #121212 !important;
+    border-bottom: none !important;
+    justify-content: space-between !important; 
+    padding: 0 1.25rem !important;
+    border-radius: 0 !important;
+    
+  }
+  
+  .main-header h1 {
+    font-size: 1.35rem !important;
+    color: #FFFFFF !important;
+    text-align: center !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  
+  .sidebar-nav-btn svg {
+    width: 26px !important;
+    height: 26px !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .mobile-only {
+    display: flex !important;
+  }
+  .mobile-hidden {
+    display: none !important;
+  }
+  
+}
+
+@media screen and (max-width: 768px) {
+  /* Enlarge the avatar button in the header */
+  .main-header .mobile-only button[style*="border-radius: 50%"] {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 1.1rem !important;
+  }
+  
+  /* Enlarge the notification bell and change its color to white/gray */
+  .main-header .mobile-only button svg {
+    width: 28px !important;
+    height: 28px !important;
+    color: #F4F4F5 !important;
+  }
+  
+  /* Adjust the notification badge size */
+  .main-header .mobile-only button span {
+    width: 16px !important;
+    height: 16px !important;
+    font-size: 0.6rem !important;
+    top: -2px !important;
+    right: 0px !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  /* Failsafe to cover the white gap during mobile browser scrolling */
+  
+}
+
+@media screen and (max-width: 768px) {
+  html, body {
+    background-color: #121212 !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .sidebar-nav-label, .sidebar-nav-btn > span:not([style*="borderRadius"]):not(.sidebar-nav-badge) {
+    display: block !important;
+    font-size: 0.65rem !important;
+    font-weight: 600 !important;
+    max-width: 100% !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .sidebar-nav-btn.active .sidebar-nav-label {
+    font-weight: 700 !important;
+    color: #FFFFFF !important;
+    transform: translateY(-1px) !important;
+  }
+
+  /* Shrink icon slightly so the text fits comfortably in the slim 54px height */
+  .sidebar-nav-btn svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+}
+@media screen and (max-width: 480px) {
+  .sidebar-nav-label, .sidebar-nav-btn > span:not([style*="borderRadius"]):not(.sidebar-nav-badge) {
+    font-size: 0.6rem !important;
+  }
+  .sidebar-nav-btn svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .stat-card .skeleton-stat-text-wrapper {
+    align-items: center !important;
+  }
+}
+
+
+/* Fix blue tap highlight globally */
+* {
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+@media screen and (max-width: 768px) {
+  .mobile-hidden-profile-field {
+    display: none !important;
+  }
+}
+
+/* ─── Dashboard page: stack to single column on mobile ─── */
+@media screen and (max-width: 768px) {
+
+  /* 2-col main grid (calendar + widgets) → single column */
+  .dashboard-main-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Stat cards: 2×2 grid on mobile instead of 4 in a row */
+  .dashboard-stats-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Calendar heading */
+  .main-content h1,
+  .main-body h1 {
+    font-size: 1.3rem !important;
+  }
+}
