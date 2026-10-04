@@ -6,7 +6,8 @@ export const MobileNav: React.FC = () => {
   const { currentPath, navigate } = useApp();
 
   const isPublicRoute = currentPath === '/' || currentPath === '/login' || currentPath === '/signup';
-  if (isPublicRoute) return null;
+  const isLegalRoute = currentPath === '/privacy' || currentPath === '/terms' || currentPath === '/cookies' || currentPath === '/refund';
+  if (isPublicRoute || isLegalRoute) return null;
 
   return (
     <nav className="mobile-nav">

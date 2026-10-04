@@ -1,4 +1,4 @@
-﻿import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Exam, UserProfile, TrackerItem, NotificationItem, ApplicationStatus, CareerResult } from '../types';
 import { INITIAL_NOTIFICATIONS } from '../data/mockData';
 import { 
@@ -46,8 +46,7 @@ export const EMPTY_NEW_PROFILE: ExtendedUserProfile = {
   accountName: '',
   state: '',
   district: '',
-  permanentAddress: '',
-  currentAddress: '',
+  subDistrict: '',
   category: '',
   isPwbd: false,
   disabilityType: '',
@@ -122,7 +121,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // User profile state
   const [userProfile, setUserProfile] = useState<ExtendedUserProfile>(EMPTY_NEW_PROFILE);
 
-  // Tracker items state â€” clear mock data
+  // Tracker items state — clear mock data
   const [trackerItems, setTrackerItems] = useState<TrackerItem[]>([]);
 
   const [exams, setExams] = useState<Exam[]>([]);
@@ -561,7 +560,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // Step 1: Try deleting Auth account FIRST (will fail fast if session is stale)
       await deleteUser(user);
 
-      // Step 2: Auth succeeded â€” now safely delete Firestore data
+      // Step 2: Auth succeeded — now safely delete Firestore data
       await deleteDoc(doc(db, 'users', targetUid));
 
       // Step 3: Teardown session and redirect
@@ -767,4 +766,5 @@ export const useApp = () => {
   if (!context) throw new Error('useApp must be used within an AppProvider');
   return context;
 };
+
 

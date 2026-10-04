@@ -49,7 +49,7 @@ export const CookieConsentBanner: React.FC = () => {
   if (!isVisible) return null;
 
   return (
-    <div style={{
+    <div className="cookie-consent-banner" style={{
       position: 'fixed',
       bottom: 0,
       left: 0,
@@ -65,12 +65,13 @@ export const CookieConsentBanner: React.FC = () => {
       zIndex: 9999,
       boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.2)'
     }}>
-      <div style={{ fontSize: '0.85rem', flex: 1, marginRight: '1rem', color: '#A1A1AA', lineHeight: 1.5 }}>
+      <div className="cookie-consent-text" style={{ fontSize: '0.85rem', flex: 1, marginRight: '1rem', color: '#A1A1AA', lineHeight: 1.5 }}>
         We use cookies to improve your experience and analyze site traffic. 
         By clicking "Accept", you consent to our <a href="/cookies" style={{ color: '#FFFFFF', textDecoration: 'underline' }}>Cookie Policy</a>.
       </div>
-      <div style={{ display: 'flex', gap: '0.75rem', flexShrink: 0 }}>
+      <div className="cookie-consent-actions" style={{ display: 'flex', gap: '0.75rem', flexShrink: 0 }}>
         <button 
+          className="cookie-consent-btn cookie-consent-decline"
           onClick={declineCookies}
           style={{
             backgroundColor: 'transparent',
@@ -86,6 +87,7 @@ export const CookieConsentBanner: React.FC = () => {
           Decline
         </button>
         <button 
+          className="cookie-consent-btn cookie-consent-accept"
           onClick={acceptCookies}
           style={{
             backgroundColor: '#FFFFFF',

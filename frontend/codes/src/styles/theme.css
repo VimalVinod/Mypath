@@ -725,3 +725,34 @@ a:hover {
 .hero-banner-container { height: auto; aspect-ratio: 3008 / 1408; }
 
 
+
+/* Skeleton Loader (Shimmer Wave, Left-to-Right, Slow and Steady) */
+.skeleton-box {
+  background-color: #E2E8F0;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-box::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.5) 30%,
+    rgba(255, 255, 255, 0.5) 70%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer-wave 2.5s infinite linear;
+}
+
+@keyframes shimmer-wave {
+  100% {
+    transform: translateX(100%);
+  }
+}

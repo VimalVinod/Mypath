@@ -15,6 +15,9 @@ import {
 import bannerOneImg from '../assets/banner-one.png';
 import bannerTwoImg from '../assets/banner-two.png';
 import bannerThreeImg from '../assets/banner-three.png';
+import notificationImg from '../assets/notification.png';
+import dashboardImg from '../assets/dashboard.png';
+import trackerImg from '../assets/tracker.png';
 
 type BannerItem = 
   | { id: string; type: 'image'; image: string; alt: string }
@@ -277,7 +280,7 @@ export const LandingPage: React.FC = () => {
       {/* Featured / Trending Exams */}
       <section style={{ padding: '4.5rem 0', backgroundColor: 'var(--bg-subtle)', borderBottom: '1px solid var(--border)' }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
                 <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--brand-red)', display: 'inline-block' }} />
@@ -295,12 +298,6 @@ export const LandingPage: React.FC = () => {
             >
               View All <ChevronRight size={16} />
             </button>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
-            {trendingExams.map(exam => (
-              <ExamCard key={exam.id} exam={exam} />
-            ))}
           </div>
         </div>
       </section>
@@ -345,39 +342,37 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Feature 1: Eligibility Matching */}
-      <section className="feature-section" style={{ backgroundColor: '#FFFFFF', borderTop: '1px solid var(--border)' }}>
-        <div className="container feature-flex">
-          <div className="feature-text-block">
-            <h2 className="feature-heading" style={{ color: '#09090B' }}>
+      <section className="feature-section" style={{ backgroundColor: '#09090B', color: '#FFFFFF', borderTop: '1px solid var(--border)', textAlign: 'center', paddingTop: '4.5rem', paddingBottom: '4.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <img 
+          src={notificationImg} 
+          alt="Exams You Qualify For Notification"
+          style={{ width: '94%', maxWidth: '1150px', height: 'auto', borderRadius: '24px', boxShadow: '0 30px 60px rgba(255, 255, 255, 0.15)', marginBottom: '3rem', display: 'block' }} 
+        />
+        <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ maxWidth: '800px' }}>
+            <h2 className="feature-heading" style={{ color: '#FFFFFF', marginBottom: '1rem' }}>
               Find Exams You Actually Qualify For.
             </h2>
-            <p className="feature-description" style={{ color: '#52525B' }}>
+            <p className="feature-description" style={{ color: '#A1A1AA', margin: '0 auto' }}>
               Stop wasting hours reading through complex official notifications. Input your age, education, and background once, and we'll instantly show you relevant central and state government exams you might be eligible to take.
             </p>
-          </div>
-          <div className="feature-image-block">
-            {/* Placeholder for future PNG image */}
-            <div style={{ width: '100%', maxWidth: '450px', aspectRatio: '4/3', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F4F4F5', borderRadius: '24px', border: '1px dashed #E4E4E7', color: '#A1A1AA', fontSize: '0.9rem' }}>
-              [ Image Placeholder ]
-            </div>
           </div>
         </div>
       </section>
 
       {/* Feature 2: Application Tracking */}
-      <section className="feature-section" style={{ backgroundColor: 'var(--bg-subtle)', borderTop: '1px solid var(--border)' }}>
-        <div className="container feature-flex feature-reverse">
-          <div className="feature-image-block">
-            {/* Placeholder for future PNG image */}
-            <div style={{ width: '100%', maxWidth: '450px', aspectRatio: '4/3', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF', borderRadius: '24px', border: '1px dashed var(--border)', color: '#A1A1AA', fontSize: '0.9rem' }}>
-              [ Image Placeholder ]
-            </div>
-          </div>
-          <div className="feature-text-block">
-            <h2 className="feature-heading" style={{ color: '#09090B' }}>
+      <section className="feature-section" style={{ backgroundColor: 'var(--bg-subtle)', borderTop: '1px solid var(--border)', textAlign: 'center', paddingTop: '4.5rem', paddingBottom: '4.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <img 
+          src={dashboardImg} 
+          alt="Application Tracking Dashboard"
+          style={{ width: '94%', maxWidth: '1150px', height: 'auto', borderRadius: '24px', boxShadow: '0 30px 60px rgba(0, 0, 0, 0.4)', marginBottom: '3rem', display: 'block' }} 
+        />
+        <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ maxWidth: '800px' }}>
+            <h2 className="feature-heading" style={{ color: '#09090B', marginBottom: '1rem' }}>
               Track Everything in One Place.
             </h2>
-            <p className="feature-description" style={{ color: '#52525B' }}>
+            <p className="feature-description" style={{ color: '#52525B', margin: '0 auto' }}>
               No more spreadsheets or scattered sticky notes. Keep track of your application statuses, admit card releases, and exam dates across dozens of organizations in a single, organized view.
             </p>
           </div>
@@ -385,21 +380,20 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Feature 3: Deadline Alerts */}
-      <section className="feature-section" style={{ backgroundColor: '#09090B', color: '#FFFFFF' }}>
-        <div className="container feature-flex">
-          <div className="feature-text-block">
-            <h2 className="feature-heading" style={{ color: '#FFFFFF' }}>
+      <section className="feature-section" style={{ backgroundColor: '#09090B', color: '#FFFFFF', textAlign: 'center', paddingTop: '4.5rem', paddingBottom: '4.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <img 
+          src={trackerImg} 
+          alt="Deadline Alerts Tracker"
+          style={{ width: '94%', maxWidth: '1150px', height: 'auto', borderRadius: '24px', boxShadow: '0 30px 60px rgba(255, 255, 255, 0.15)', marginBottom: '3rem', display: 'block' }} 
+        />
+        <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ maxWidth: '800px' }}>
+            <h2 className="feature-heading" style={{ color: '#FFFFFF', marginBottom: '1rem' }}>
               Never Miss a Deadline Again.
             </h2>
-            <p className="feature-description" style={{ color: '#A1A1AA' }}>
+            <p className="feature-description" style={{ color: '#A1A1AA', margin: '0 auto' }}>
               Missing an application window can set your career back by an entire year. Our smart notification system sends you timely reminders before applications close and when admit cards are released.
             </p>
-          </div>
-          <div className="feature-image-block">
-            {/* Placeholder for future PNG image */}
-            <div style={{ width: '100%', maxWidth: '450px', aspectRatio: '4/3', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#18181B', borderRadius: '24px', border: '1px dashed #27272A', color: '#71717A', fontSize: '0.9rem' }}>
-              [ Image Placeholder ]
-            </div>
           </div>
         </div>
       </section>

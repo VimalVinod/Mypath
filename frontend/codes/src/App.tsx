@@ -9,6 +9,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { BrowseExamsPage } from './pages/BrowseExamsPage';
 import { TrackerPage } from './pages/TrackerPage';
+import { StudyMaterialsPage } from './pages/StudyMaterialsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { NotificationsPage } from './pages/NotificationsPage';
 
@@ -17,6 +18,7 @@ import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 import { TermsPage } from './pages/TermsPage';
 import { CookiePolicyPage } from './pages/CookiePolicyPage';
 import { RefundPolicyPage } from './pages/RefundPolicyPage';
+import { FullPageSkeleton } from './components/FullPageSkeleton';
 
 const MainRouter: React.FC = () => {
   const { currentPath, currentUser, authLoading, authNotice, navigate, setAuthNotice } = useApp();
@@ -25,7 +27,7 @@ const MainRouter: React.FC = () => {
     if (authLoading) return;
 
     // Protected routes array
-    const protectedRoutes = ['/dashboard', '/exams', '/tracker', '/profile'];
+    const protectedRoutes = ['/dashboard', '/exams', '/tracker', '/materials', '/profile', '/notifications'];
     
     if (protectedRoutes.includes(currentPath)) {
       if (!currentUser) {
@@ -40,25 +42,11 @@ const MainRouter: React.FC = () => {
     }
   }, [currentPath, currentUser, authLoading, navigate, setAuthNotice]);
 
-  const protectedRoutes = ['/dashboard', '/exams', '/tracker', '/profile'];
+  const protectedRoutes = ['/dashboard', '/exams', '/tracker', '/materials', '/profile', '/notifications'];
 
   if (protectedRoutes.includes(currentPath)) {
     if (authLoading) {
-      return (
-        <div 
-          data-testid="auth-loading" 
-          style={{ 
-            minHeight: '100vh', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            fontSize: '1.2rem', 
-            color: 'var(--text-secondary)' 
-          }}
-        >
-          Loading session...
-        </div>
-      );
+      return <FullPageSkeleton />;
     }
     if (!currentUser || !currentUser.emailVerified) {
       const notice = !currentUser?.emailVerified
@@ -96,6 +84,7 @@ const MainRouter: React.FC = () => {
     if (currentPath === '/dashboard') return <DashboardPage />;
     if (currentPath === '/exams') return <BrowseExamsPage />;
     if (currentPath === '/tracker') return <TrackerPage />;
+    if (currentPath === '/materials') return <StudyMaterialsPage />;
     if (currentPath === '/profile') return <ProfilePage />;
     if (currentPath === '/notifications') return <NotificationsPage />;
   }

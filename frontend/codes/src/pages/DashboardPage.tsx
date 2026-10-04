@@ -235,7 +235,7 @@ export const DashboardPage: React.FC = () => {
 
       {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div style={{ marginBottom: '1.75rem' }}>
-        <p style={{ margin: 0, fontSize: '0.83rem', color: '#6B7280', fontWeight: 500 }}>{greeting} ðŸ‘‹</p>
+        <p style={{ margin: 0, fontSize: '0.83rem', color: '#6B7280', fontWeight: 500 }}>{greeting} <span>&#128075;</span></p>
         <h1 style={{ margin: '0.15rem 0 0', fontSize: '1.6rem', fontWeight: 800, color: '#111827', letterSpacing: '-0.02em', lineHeight: 1.2 }}>{firstName}</h1>
       </div>
 
@@ -277,7 +277,7 @@ export const DashboardPage: React.FC = () => {
               </div>
             </div>
             <div style={{ display: 'flex', gap: '0.35rem' }}>
-              {['â€¹', 'â€º'].map((sym, di) => (
+              {['<', '>'].map((sym, di) => (
                 <button key={sym} onClick={di === 0 ? () => setCalDate(new Date(yr, mo - 1, 1)) : () => setCalDate(new Date(yr, mo + 1, 1))} style={{ width: 32, height: 32, borderRadius: '8px', border: '1px solid #E4E4E7', background: '#fff', cursor: 'pointer', fontSize: '1rem', fontWeight: 700, color: '#374151', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {sym}
                 </button>
@@ -381,4 +381,5 @@ export const DashboardPage: React.FC = () => {
 };
 
 export default DashboardPage;
+
 

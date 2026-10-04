@@ -57,14 +57,12 @@ export interface UserProfile {
   // Personal Details
   dob: string;
   gender: string;
-  fathersName: string;
-  mothersName: string;
+  accountName?: string;
 
   // Address
   state: string;
   district: string;
-  permanentAddress: string;
-  currentAddress: string;
+  subDistrict?: string;
 
   // Demographics / Category
   category: 'General' | 'EWS' | 'OBC-NCL' | 'SC' | 'ST' | '';
@@ -133,3 +131,4 @@ export interface ResourceItem {
   url: string;
   thumbnailUrl?: string;
 }
+

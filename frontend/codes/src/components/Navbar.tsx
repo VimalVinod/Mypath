@@ -7,6 +7,7 @@ export const Navbar: React.FC = () => {
   const { currentPath, navigate, userProfile, unreadNotificationCount } = useApp();
 
   const isPublicRoute = currentPath === '/' || currentPath === '/login' || currentPath === '/signup';
+  const isLegalRoute = currentPath === '/privacy' || currentPath === '/terms' || currentPath === '/cookies' || currentPath === '/refund';
 
   return (
     <nav className="navbar" style={{ backgroundColor: '#000000', borderBottom: '1px solid #1C1C1E', padding: '0.65rem 0' }}>
@@ -45,7 +46,7 @@ export const Navbar: React.FC = () => {
           </a>
 
           {/* Desktop Nav Links - All White Text */}
-          {!isPublicRoute ? (
+          {(!isPublicRoute && !isLegalRoute) ? (
             <ul className="nav-links">
               <li>
                 <a 
@@ -71,97 +72,99 @@ export const Navbar: React.FC = () => {
           ) : null}
         </div>
 
-
         {/* Auth / User Actions */}
-        <div className="nav-auth-desktop" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          {isPublicRoute ? (
-            <>
-              <button 
-                className="btn btn-ghost btn-sm" 
-                onClick={() => navigate('/login')}
-                style={{ color: '#FFFFFF', border: 'none', fontWeight: 600 }}
-              >
-                Log In
-              </button>
-              <button 
-                className="btn btn-sm" 
-                onClick={() => navigate('/signup')}
-                style={{ 
-                  backgroundColor: '#FFFFFF', 
-                  color: '#000000', 
-                  fontWeight: 700, 
-                  border: 'none',
-                  borderRadius: '4px',
-                  padding: '0.5rem 1.1rem'
-                }}
-              >
-                Get Started Free
-              </button>
-            </>
-          ) : (
-            <>
-              {/* Notification Bell */}
-              <button 
-                className="btn btn-ghost"
-                style={{ position: 'relative', padding: '0.5rem', borderRadius: '50%', color: '#FFFFFF' }}
-                onClick={() => navigate('/dashboard')}
-                title="Notifications"
-              >
-                <Bell size={18} color="#FFFFFF" />
-                {unreadNotificationCount > 0 && (
-                  <span 
-                    style={{
-                      position: 'absolute',
-                      top: '4px',
-                      right: '4px',
-                      width: '8px',
-                      height: '8px',
-                      backgroundColor: 'var(--brand-red)',
-                      borderRadius: '50%',
-                      border: '1.5px solid #000000'
-                    }}
-                  />
-                )}
-              </button>
-
-              {/* Profile Avatar button */}
-              <button 
-                className="btn btn-ghost"
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '0.5rem',
-                  padding: '0.4rem 0.85rem',
-                  borderRadius: '999px',
-                  backgroundColor: '#1C1C1E',
-                  border: '1.5px solid #333333'
-                }}
-                onClick={() => navigate('/profile')}
-              >
-                <div 
+        {!isLegalRoute && (
+          <div className="nav-auth-desktop" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            {isPublicRoute ? (
+              <>
+                <button 
+                  className="btn btn-ghost btn-sm" 
+                  onClick={() => navigate('/login')}
+                  style={{ color: '#FFFFFF', border: 'none', fontWeight: 600 }}
+                >
+                  Log In
+                </button>
+                <button 
+                  className="btn btn-sm" 
+                  onClick={() => navigate('/signup')}
                   style={{ 
-                    width: '26px', 
-                    height: '26px', 
-                    borderRadius: '50%', 
-                    backgroundColor: '#FFFFFF',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 700,
-                    color: '#000000',
-                    fontSize: '0.78rem'
+                    backgroundColor: '#FFFFFF', 
+                    color: '#000000', 
+                    fontWeight: 700, 
+                    border: 'none',
+                    borderRadius: '4px',
+                    padding: '0.5rem 1.1rem'
                   }}
                 >
-                  {userProfile.name.charAt(0)}
-                </div>
-                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#FFFFFF' }}>
-                  {userProfile.name.split(' ')[0]}
-                </span>
-              </button>
-            </>
-          )}
-        </div>
+                  Get Started Free
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Notification Bell */}
+                <button 
+                  className="btn btn-ghost"
+                  style={{ position: 'relative', padding: '0.5rem', borderRadius: '50%', color: '#FFFFFF' }}
+                  onClick={() => navigate('/dashboard')}
+                  title="Notifications"
+                >
+                  <Bell size={18} color="#FFFFFF" />
+                  {unreadNotificationCount > 0 && (
+                    <span 
+                      style={{
+                        position: 'absolute',
+                        top: '4px',
+                        right: '4px',
+                        width: '8px',
+                        height: '8px',
+                        backgroundColor: 'var(--brand-red)',
+                        borderRadius: '50%',
+                        border: '1.5px solid #000000'
+                      }}
+                    />
+                  )}
+                </button>
+
+                {/* Profile Avatar button */}
+                <button 
+                  className="btn btn-ghost"
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem',
+                    padding: '0.4rem 0.85rem',
+                    borderRadius: '999px',
+                    backgroundColor: '#1C1C1E',
+                    border: '1.5px solid #333333'
+                  }}
+                  onClick={() => navigate('/profile')}
+                >
+                  <div 
+                    style={{ 
+                      width: '26px', 
+                      height: '26px', 
+                      borderRadius: '50%', 
+                      backgroundColor: '#FFFFFF',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 700,
+                      color: '#000000',
+                      fontSize: '0.78rem'
+                    }}
+                  >
+                    {userProfile.name.charAt(0)}
+                  </div>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#FFFFFF' }}>
+                    {userProfile.name.split(' ')[0]}
+                  </span>
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </nav>
   );
 };
+

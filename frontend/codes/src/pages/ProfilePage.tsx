@@ -1,8 +1,21 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { SidebarLayout } from '../components/SidebarLayout';
 import { User, MapPin, GraduationCap, Briefcase, Users, Save, Plus, X, ShieldAlert } from 'lucide-react';
 import { statesAndDistricts } from '../data/statesAndDistricts';
+import BOARDS from '../data/boards.json';
+import UNIVERSITIES from '../data/universities.json';
+
+const EDUCATION_STREAMS: Record<string, string[]> = {
+  '10th': ['General'],
+  '12th': ['Science (PCM)', 'Science (PCB)', 'Commerce', 'Arts / Humanities'],
+  'Diploma': ['Mechanical Engineering', 'Civil Engineering', 'Electrical Engineering', 'Computer Science', 'Other'],
+  'Bachelor\'s': ['B.Tech / B.E.', 'B.Sc.', 'B.A.', 'B.Com.', 'BBA', 'BCA', 'MBBS', 'LLB', 'Other'],
+  'Master\'s': ['M.Tech / M.E.', 'M.Sc.', 'M.A.', 'M.Com.', 'MBA', 'MCA', 'MD', 'Other']
+};
+
+
+
 
 export const ProfilePage: React.FC = () => {
   const { currentUser, userProfile, updateUserProfile, navigate, logoutUser, deleteAccount, linkGoogleAccount, linkPasswordAccount } = useApp();
@@ -19,9 +32,7 @@ export const ProfilePage: React.FC = () => {
     gender: '',
     state: '',
     district: '',
-    permanentAddress: '',
-    currentAddress: '',
-    isSameAddress: false,
+    subDistrict: '',
     category: '',
     isPwbd: false,
     disabilityType: '',
@@ -41,9 +52,7 @@ export const ProfilePage: React.FC = () => {
         gender: userProfile.gender || '',
         state: userProfile.state || '',
         district: userProfile.district || '',
-        permanentAddress: userProfile.permanentAddress || '',
-        currentAddress: userProfile.currentAddress || '',
-        isSameAddress: userProfile.permanentAddress === userProfile.currentAddress && userProfile.permanentAddress !== '',
+        subDistrict: userProfile.subDistrict || '',
         category: userProfile.category || '',
         isPwbd: userProfile.isPwbd || false,
         disabilityType: userProfile.disabilityType || '',
@@ -68,17 +77,13 @@ export const ProfilePage: React.FC = () => {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData(prev => {
         const next = { ...prev, [name]: checked };
-        if (name === 'isSameAddress') {
-          next.currentAddress = checked ? next.permanentAddress : '';
-        }
+        
         return next;
       });
     } else {
       setFormData(prev => {
         const next = { ...prev, [name]: value };
-        if (name === 'permanentAddress' && prev.isSameAddress) {
-          next.currentAddress = value;
-        }
+        
         if (name === 'state') {
           next.district = ''; // reset district when state changes
         }
@@ -117,7 +122,7 @@ export const ProfilePage: React.FC = () => {
         throw new Error("Please fill in your name and all the required personal and address fields.");
       }
 
-      const { isSameAddress, ...profileDataToSave } = formData;
+      const { ...profileDataToSave } = formData;
 
             await updateUserProfile({
         ...profileDataToSave,
@@ -128,7 +133,7 @@ export const ProfilePage: React.FC = () => {
       // INSTANT MATCH - Real-time sync with backend!
       if (currentUser?.uid) {
         try {
-          await fetch('https://mypath-backend-two.vercel.app/match-user', {
+          await fetch('https://mypath-hub.vercel.app/match-user', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: currentUser?.uid })
@@ -140,6 +145,7 @@ export const ProfilePage: React.FC = () => {
       
       setSaveSuccess(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => { navigate('/dashboard'); }, 1500);
       setTimeout(() => setSaveSuccess(false), 3000);
       
       if (userProfile && !userProfile.isProfileComplete) {
@@ -148,6 +154,7 @@ export const ProfilePage: React.FC = () => {
     } catch (err: any) {
       setSaveError(err.message || 'Failed to save profile. Please try again.');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => { navigate('/dashboard'); }, 1500);
     } finally {
       setIsSaving(false);
     }
@@ -165,6 +172,7 @@ export const ProfilePage: React.FC = () => {
     } catch (err: any) {
       setSaveError(err.message || 'Failed to delete account. Please try again or log out and log back in.');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => { navigate('/dashboard'); }, 1500);
     }
   };
 
@@ -177,7 +185,7 @@ export const ProfilePage: React.FC = () => {
 
         {saveSuccess && (
           <div style={{ backgroundColor: '#F0FDF4', border: '1px solid #BBF7D0', padding: '0.875rem 1.25rem', borderRadius: '10px', color: '#065F46', marginBottom: '1.5rem', fontWeight: 500, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            âœ“ Profile saved successfully!
+            ✓ Profile saved successfully!
           </div>
         )}
 
@@ -200,7 +208,7 @@ export const ProfilePage: React.FC = () => {
           <section style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
               <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem', fontWeight: 700, margin: 0, color: '#0F172A' }}>
-                <User size={18} color="#6B8E23" /> Personal Details
+                <User size={18} color="#10B981" /> Personal Details
               </h2>
               <button 
                 type="button" 
@@ -256,49 +264,36 @@ export const ProfilePage: React.FC = () => {
 
           
           {/* Section 2: Address */}
-          <section style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+          <section style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '2rem' }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem', fontWeight: 700, borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem', color: '#0F172A' }}>
-              <MapPin size={18} color="#6B8E23" /> Address & Domicile
+              <MapPin size={18} color="#10B981" /> Contact & Location
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem' }}>State *</label>
-                <select name="state" value={formData.state} onChange={handleChange} required style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF' }}>
+                <select name="state" value={formData.state || ''} onChange={(e) => { handleChange(e); setFormData(prev => ({ ...prev, district: '' })); }} required style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF' }}>
                   <option value="">Select State</option>
                   {states.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem' }}>District *</label>
-                <select name="district" value={formData.district} onChange={handleChange} required disabled={!formData.state} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #CBD5E1', backgroundColor: formData.state ? '#FFFFFF' : '#F1F5F9' }}>
+                <select name="district" value={formData.district || ''} onChange={handleChange} required disabled={!formData.state} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #CBD5E1', backgroundColor: formData.state ? '#FFFFFF' : '#F8FAFC' }}>
                   <option value="">Select District</option>
                   {districts.map(d => <option key={d} value={d}>{d}</option>)}
-                  {formData.state && districts.length === 0 && <option value="Other">Other</option>}
                 </select>
               </div>
-            </div>
-
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem' }}>Permanent Address</label>
-              <textarea name="permanentAddress" value={formData.permanentAddress} onChange={handleChange} rows={2} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #CBD5E1', resize: 'vertical' }} placeholder="House/Flat No., Street, Village/Town, Pincode" />
-            </div>
-
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>Current / Correspondence Address</label>
-                <label style={{ fontSize: '0.8rem', color: '#0F172A', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                  <input type="checkbox" name="isSameAddress" checked={formData.isSameAddress} onChange={handleChange} style={{ width: '16px', height: '16px' }} />
-                  Same as Permanent Address
-                </label>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem' }}>Village / Sub-District</label>
+                <input type="text" name="subDistrict" value={formData.subDistrict || ''} onChange={handleChange} placeholder="e.g. Thiruvalla" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #CBD5E1' }} />
               </div>
-              <textarea name="currentAddress" value={formData.currentAddress} onChange={handleChange} disabled={formData.isSameAddress} rows={2} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #CBD5E1', resize: 'vertical', backgroundColor: formData.isSameAddress ? '#F8FAFC' : '#FFFFFF' }} placeholder="House/Flat No., Street, Village/Town, Pincode" />
             </div>
           </section>
 
           {/* Section 3: Educational Qualifications */}
           <section style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem', fontWeight: 700, borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem', color: '#0F172A' }}>
-              <GraduationCap size={18} color="#6B8E23" /> Educational Qualifications
+              <GraduationCap size={18} color="#10B981" /> Educational Qualifications
             </h2>
             
             {formData.education.map((edu, index) => (
@@ -306,22 +301,39 @@ export const ProfilePage: React.FC = () => {
                 <button type="button" onClick={() => removeEducation(index)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', padding: '0.25rem' }}>
                   <X size={18} />
                 </button>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: '0.4rem' }}>Qualification Level *</label>
-                    <select value={edu.level} onChange={(e) => handleEducationChange(index, 'level', e.target.value)} required style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #CBD5E1' }}>
+                    <select value={edu.level} onChange={(e) => { handleEducationChange(index, 'level', e.target.value); handleEducationChange(index, 'streamOrSubject', ''); handleEducationChange(index, 'boardOrUniversity', ''); }} required style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF' }}>
                       <option value="">Select Level</option>
-                      <option value="10th">10th / SSLC / Matriculation</option>
-                      <option value="12th">12th / HSC / Intermediate</option>
-                      <option value="Diploma">Diploma</option>
-                      <option value="Graduate">Graduate / Bachelor's</option>
-                      <option value="PG">Post Graduate / Master's</option>
+                      {Object.keys(EDUCATION_STREAMS).map(lvl => <option key={lvl} value={lvl}>{lvl}</option>)}
                       <option value="PhD">PhD / Doctorate</option>
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: '0.4rem' }}>Subject / Stream</label>
-                    <input type="text" value={edu.streamOrSubject} onChange={(e) => handleEducationChange(index, 'streamOrSubject', e.target.value)} placeholder="e.g. Science, B.Tech CS" style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #CBD5E1' }} />
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: '0.4rem' }}>Stream / Subject *</label>
+                    <select value={edu.streamOrSubject} onChange={(e) => handleEducationChange(index, 'streamOrSubject', e.target.value)} required disabled={!edu.level} style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #CBD5E1', backgroundColor: edu.level ? '#FFFFFF' : '#F8FAFC' }}>
+                      <option value="">Select Stream</option>
+                      {EDUCATION_STREAMS[edu.level]?.map(stream => <option key={stream} value={stream}>{stream}</option>)}
+                      {edu.level === 'PhD' && <option value="PhD Topic">Doctorate Research</option>}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: '0.4rem' }}>Board / University *</label>
+                    <input list={`uni-list-${index}`} value={edu.boardOrUniversity} onChange={(e) => handleEducationChange(index, 'boardOrUniversity', e.target.value)} placeholder={edu.level === '10th' || edu.level === '12th' ? "Search Board..." : "Search University..."} disabled={!edu.level} required style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #CBD5E1', backgroundColor: edu.level ? '#FFFFFF' : '#F8FAFC' }} />
+                    <datalist id={`uni-list-${index}`}>
+                      {(edu.level === '10th' || edu.level === '12th' ? BOARDS : UNIVERSITIES).map(uni => <option key={uni} value={uni} />)}
+                    </datalist>
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: '0.4rem' }}>Year of Passing *</label>
+                    <input type="number" value={edu.passingYear} onChange={(e) => handleEducationChange(index, 'passingYear', e.target.value)} required min="1950" max="2030" placeholder="YYYY" style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #CBD5E1' }} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#475569', marginBottom: '0.4rem' }}>Percentage / CGPA *</label>
+                    <input type="text" value={edu.percentageOrCgpa} onChange={(e) => handleEducationChange(index, 'percentageOrCgpa', e.target.value)} required placeholder="e.g. 85% or 8.5" style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #CBD5E1' }} />
                   </div>
                 </div>
                 <div style={{ marginBottom: '1rem' }}>
@@ -349,7 +361,7 @@ export const ProfilePage: React.FC = () => {
           {/* Section 4: Disability & Employment */}
           <section style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem', fontWeight: 700, borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem', color: '#0F172A' }}>
-              <Briefcase size={18} color="#6B8E23" /> Special Status & Employment
+              <Briefcase size={18} color="#10B981" /> Special Status & Employment
             </h2>
             
             <div style={{ display: 'grid', gap: '1.5rem' }}>
@@ -394,29 +406,13 @@ export const ProfilePage: React.FC = () => {
             </div>
           </section>
 
-          {/* Section 5: Family Details */}
-          <section style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E2E8F0', padding: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem', fontWeight: 700, borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem', marginBottom: '1.5rem', color: '#0F172A' }}>
-              <Users size={18} color="#6B8E23" /> Family Details
-            </h2>
-            
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '0.5rem' }}>Parents' Annual Income (â‚¹)</label>
-              <select name="parentsAnnualIncome" value={formData.parentsAnnualIncome} onChange={handleChange} style={{ width: '100%', maxWidth: '350px', padding: '0.75rem', borderRadius: '8px', border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF' }}>
-                <option value="">Select Income Bracket</option>
-                <option value="Below 2.5 Lakhs">Below 2.5 Lakhs</option>
-                <option value="2.5 Lakhs - 5 Lakhs">2.5 Lakhs - 5 Lakhs</option>
-                <option value="5 Lakhs - 8 Lakhs">5 Lakhs - 8 Lakhs</option>
-                <option value="Above 8 Lakhs">Above 8 Lakhs (Creamy Layer)</option>
-              </select>
-            </div>
-          </section>
+          
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
             <button 
               type="submit" 
               disabled={isSaving}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.85rem 2.25rem', backgroundColor: '#6B8E23', color: 'white', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '1rem', cursor: isSaving ? 'not-allowed' : 'pointer', opacity: isSaving ? 0.7 : 1, boxShadow: '0 4px 12px rgba(107,142,35,0.25)' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.85rem 2.25rem', backgroundColor: '#10B981', color: 'white', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '1rem', cursor: isSaving ? 'not-allowed' : 'pointer', opacity: isSaving ? 0.7 : 1, boxShadow: '0 4px 12px rgba(16,185,129,0.25)' }}
             >
               <Save size={18} />
               {isSaving ? 'Saving...' : 'Save Profile'}
@@ -429,6 +425,8 @@ export const ProfilePage: React.FC = () => {
 };
 
 export default ProfilePage;
+
+
 
 
 

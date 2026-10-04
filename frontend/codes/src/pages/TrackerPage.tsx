@@ -47,7 +47,7 @@ export const TrackerPage: React.FC = () => {
       ) : (
         <div style={{ backgroundColor: '#FFFFFF', borderRadius: '14px', border: '1px solid #E2E8F0', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
           {/* Table Header */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 160px 160px 140px', gap: '1rem', padding: '0.875rem 1.5rem', backgroundColor: '#F8FAFC', borderBottom: '1px solid #E2E8F0' }}>
+          <div className="tracker-table-row" style={{ display: 'grid', gridTemplateColumns: '1fr 160px 160px 140px', gap: '1rem', padding: '0.875rem 1.5rem', backgroundColor: '#F8FAFC', borderBottom: '1px solid #E2E8F0' }}>
             {['Exam', 'Organization', 'Deadline', 'Status'].map(h => (
               <span key={h} style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</span>
             ))}
@@ -57,7 +57,7 @@ export const TrackerPage: React.FC = () => {
           {trackerItems.map((item, idx) => {
             const sc = statusColors[item.status] || statusColors['Bookmarked'];
             return (
-              <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '1fr 160px 160px 140px', gap: '1rem', padding: '1rem 1.5rem', borderBottom: idx < trackerItems.length - 1 ? '1px solid #F1F5F9' : 'none', alignItems: 'center' }}>
+              <div key={item.id} className="tracker-table-row" style={{ display: 'grid', gridTemplateColumns: '1fr 160px 160px 140px', gap: '1rem', padding: '1rem 1.5rem', borderBottom: idx < trackerItems.length - 1 ? '1px solid #F1F5F9' : 'none', alignItems: 'center' }}>
                 <div>
                   <div style={{ fontWeight: 600, color: '#0F172A', fontSize: '0.9rem' }}>{item.examName}</div>
                 </div>
