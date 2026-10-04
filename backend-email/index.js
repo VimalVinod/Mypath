@@ -116,10 +116,12 @@ app.post('/send-verification', async (req, res) => {
 });
 
 app.post('/send-exam-alerts', async (req, res) => {
-  const { email, name, newExams } = req.body;
-  if (!email || !newExams || newExams.length === 0) return res.status(400).json({ error: 'Missing data' });
+  const { email, name, newExams, mightBeEligibleExams } = req.body;
+  if (!email) return res.status(400).json({ error: 'Missing email' });
+  if ((!newExams || newExams.length === 0) && (!mightBeEligibleExams || mightBeEligibleExams.length === 0)) return res.status(400).json({ error: 'Missing data' });
   try {
-    const examListHtml = newExams.map(exam => `<div style='margin-bottom:16px;padding:12px;background:#f9f9f9;border-left:4px solid #000;'><h3 style='margin:0 0 4px;font-size:16px;color:#111;'>${exam.title || exam.examName}</h3><p style='margin:0;font-size:13px;color:#555;'>Deadline: ${exam.applicationEndDate || exam.importantDates?.applicationEndDate || 'N/A'}</p></div>`).join('');
+    const examListHtml = (newExams && newExams.length > 0) ? newExams.map(exam => `<div style='margin-bottom:16px;padding:12px;background:#f9f9f9;border-left:4px solid #000;'><h3 style='margin:0 0 4px;font-size:16px;color:#111;'>${exam.title || exam.examName}</h3><p style='margin:0;font-size:13px;color:#555;'>Deadline: ${exam.applicationEndDate || exam.importantDates?.applicationEndDate || 'N/A'}</p></div>`).join('') : '';
+    const maybeListHtml = (mightBeEligibleExams && mightBeEligibleExams.length > 0) ? mightBeEligibleExams.map(exam => `<div style='margin-bottom:16px;padding:12px;background:#fff8e1;border-left:4px solid #ffc107;'><h3 style='margin:0 0 4px;font-size:16px;color:#111;'>${exam.title || exam.examName}</h3><p style='margin:0;font-size:13px;color:#555;'>Deadline: ${exam.applicationEndDate || exam.importantDates?.applicationEndDate || 'N/A'}</p></div>`).join('') : '';
     
     const htmlContent = `
       <!DOCTYPE html>
@@ -136,12 +138,20 @@ app.post('/send-exam-alerts', async (req, res) => {
                 </tr>
                 <tr>
                   <td align="left" style="padding: 48px 40px 32px;">
-                    <h1 style="font-size: 24px; font-weight: 800; color: #111111; margin: 0 0 16px;">Good news, ${name || 'User'}!</h1>
+                    <h1 style="font-size: 24px; font-weight: 800; color: #111111; margin: 0 0 16px;">Exam Update, ${name || 'User'}!</h1>
+                    ${(newExams && newExams.length > 0) ? `
                     <p style="font-size: 15px; color: #555555; line-height: 1.6; margin: 0 0 24px;">
                       You are eligible for <strong>${newExams.length} new exams</strong> based on your MyPath profile:
                     </p>
-                    
                     ${examListHtml}
+                    ` : ''}
+                    
+                    ${(mightBeEligibleExams && mightBeEligibleExams.length > 0) ? `
+                    <p style="font-size: 15px; color: #555555; line-height: 1.6; margin: 24px 0 16px; border-top: 1px solid #eee; padding-top: 24px;">
+                      <strong>?? Action Required:</strong> We found <strong>${mightBeEligibleExams.length} additional exams</strong> that might match your profile, but we couldn't verify the exact requirements. Please check these manually:
+                    </p>
+                    ${maybeListHtml}
+                    ` : ''}
                     
                     <div style="text-align: center; margin-top: 32px;">
                       <a href="https://mypath0.web.app/dashboard" style="display: inline-block; padding: 15px 36px; background-color: #000000; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: bold; border-radius: 4px; text-transform: uppercase;">
@@ -170,7 +180,7 @@ app.post('/send-exam-alerts', async (req, res) => {
     `;
 
     const senderEmail = process.env.SENDER_EMAIL || 'MyPath Team <noreply@wildcodestudios.in>';
-    const { data, error } = await resend.emails.send({ from: senderEmail, to: [email], subject: `You are eligible for ${newExams.length} new exam(s)!`, html: htmlContent });
+    const { data, error } = await resend.emails.send({ from: senderEmail, to: [email], subject: `MyPath Exam Alert: ${((newExams?.length || 0) + (mightBeEligibleExams?.length || 0))} new exams found`, html: htmlContent });
     if (error) throw error;
     res.status(200).json({ success: true, data });
   } catch (error) {
