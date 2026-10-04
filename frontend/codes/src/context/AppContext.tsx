@@ -137,6 +137,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           
           // Determine if the user is eligible by checking their assigned hashes
           const isEligible = userProfile?.eligibleExams?.includes(doc.id);
+          const mightBeEligible = userProfile?.mightBeEligibleExams?.includes(doc.id);
+          let computedMatchLevel = 'Not Eligible';
+          if (isEligible) computedMatchLevel = 'Eligible';
+          else if (mightBeEligible) computedMatchLevel = 'Probably Eligible';
 
           return {
             id: doc.id,
@@ -144,7 +148,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             shortName: data.shortName || data.title || data.examName || '',
             organization: data.organization || data.conductingBody || '',
             type: data.type || 'Government',
-            matchLevel: isEligible ? 'Eligible' : 'Not Eligible',
+            matchLevel: computedMatchLevel,
             deadlineDate: data.deadlineDate || data.importantDates?.applicationEndDate || new Date().toISOString(),
             daysRemaining,
             notificationDate: data.notificationDate || data.importantDates?.notificationDate || new Date().toISOString(),
