@@ -1,0 +1,24 @@
+College of Engineering, Chengannur
+Department of Computer Engineering
+BTech Computer Science and Engineering
+CSD415 Project Phase 1 (2026)
+Periodic Report: 27-08-26 to 09-09-26 (Week 4)
+Title: MyPath - Discover and Track Your Exam Matches
+Project Group Number: 15
+
++----------------+---------------------------+---------------------------+---------------------------+---------------+
+| Who?           | Work Assigned             | Work Done                 | Work Scheduled for next   | Assessment by |
+|                |                           |                           | 14 Days                   | Guide         |
++----------------+---------------------------+---------------------------+---------------------------+---------------+
+| Roll No: 04    | Submit the project design | Completed design report.  | First interim evaluation  |               |
+| Abhishek S     | report. Implementation    | Full stack frontend       | preparation.              |               |
+| Kumar          | of project features.      | deployed on Firebase.     |                           |               |
++----------------+---------------------------+---------------------------+---------------------------+---------------+
+| Roll No: 62    | Submit project design     | Completed design report   | First interim evaluation  |               |
+| Varada T V     | report. Update project    | and architecture          | preparation.              |               |
+|                | documentation.            | diagrams.                 |                           |               |
++----------------+---------------------------+---------------------------+---------------------------+---------------+
+| Roll No: 69    | Implementation of the     | Full stack dev (backend   | Finalize version control  |               |
+| Vimal Vinod    | project base paper.       | scraper, email pipeline,  | and deploy.               |               |
+|                |                           | 179 tests passing).       |                           |               |
++----------------+---------------------------+---------------------------+---------------------------+---------------+

@@ -1,5 +1,5 @@
 # Firebase secrets — NEVER commit these
-global_resources/firebase-service-account.json
+mypath_docs/global_resources/firebase-service-account.json
 
 # Environment variables — NEVER commit these
 **/.env
@@ -13,3 +13,4 @@ global_resources/firebase-service-account.json
 
 # Agent artifacts
 backend-cronjob/.agents/
+

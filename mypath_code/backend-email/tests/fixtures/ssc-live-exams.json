@@ -1,0 +1,57 @@
+{
+  "statusCode": "200",
+  "statusMessage": "Document Found!",
+  "data": [
+    {
+      "id": "nh3ahrp5ztg63ds2",
+      "examId": "s40d16naqchsl26",
+      "examYear": "2026",
+      "examCode": "CHSL",
+      "examName": "Combined Higher Secondary Level (10+2) Examination 2026",
+      "applicationStartDate": "2026-09-07",
+      "applicationEndDate": "2026-10-07T17:30:00.000Z",
+      "lastDateForFee": "2026-10-08T17:30:00.000Z",
+      "correctionStartDate": "2026-10-14",
+      "correctionEndDate": "2026-10-16T17:30:00.000Z",
+      "fee": "100",
+      "minAge": 18,
+      "maxAge": 27,
+      "isActive": true,
+      "navigationUrl": "/ApplicationForm/chslform"
+    },
+    {
+      "id": "cgl2026live99x1",
+      "examId": "s99d21naqcgl26",
+      "examYear": "2026",
+      "examCode": "CGL",
+      "examName": "Combined Graduate Level Examination 2026",
+      "applicationStartDate": "2026-08-15",
+      "applicationEndDate": "2026-09-15T17:30:00.000Z",
+      "lastDateForFee": "2026-09-16T17:30:00.000Z",
+      "correctionStartDate": "2026-09-20",
+      "correctionEndDate": "2026-09-22T17:30:00.000Z",
+      "fee": "100",
+      "minAge": 18,
+      "maxAge": 32,
+      "isActive": true,
+      "navigationUrl": "/ApplicationForm/cglform"
+    },
+    {
+      "id": "mts2026live33k8",
+      "examId": "s33d08naqmts26",
+      "examYear": "2026",
+      "examCode": "MTS",
+      "examName": "Multi Tasking (Non-Technical) Staff Examination 2026",
+      "applicationStartDate": "2026-09-01",
+      "applicationEndDate": "2026-09-30T17:30:00.000Z",
+      "lastDateForFee": "2026-10-01T17:30:00.000Z",
+      "correctionStartDate": "2026-10-05",
+      "correctionEndDate": "2026-10-06T17:30:00.000Z",
+      "fee": "100",
+      "minAge": 18,
+      "maxAge": 25,
+      "isActive": true,
+      "navigationUrl": "/ApplicationForm/mtsform"
+    }
+  ]
+}
