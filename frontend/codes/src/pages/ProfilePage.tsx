@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { checkEligibility } from '../eligibility';
+import { db, getDocs, collection } from '../firebase';
 import { SidebarLayout } from '../components/SidebarLayout';
 import { User, MapPin, GraduationCap, Briefcase, Users, Save, Plus, X, ShieldAlert } from 'lucide-react';
 import { statesAndDistricts } from '../data/statesAndDistricts';

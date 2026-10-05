@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { checkEligibility } from '../eligibility';
+import { db, getDocs, collection } from '../firebase';
 import {
   LayoutDashboard, Search, ListChecks, User, Bell, BookOpen,
   LogOut, ChevronRight, Menu, X, RefreshCw
@@ -47,21 +48,34 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, pageTitl
   const selectedAvatar = userProfile?.avatarUrl || '';
 
   const handleRefresh = async () => {
-    alert("Your page will be refreshing in a couple of seconds...");
+    alert("Refreshing your eligibility data... This will take a couple of seconds.");
     try {
-      // Hit the Vercel backend to force a sync
+      // Step 1: Fetch ALL raw exam documents directly from Firestore
+      const examsSnapshot = await getDocs(collection(db, 'exams'));
+
       const eligibleHashes: string[] = [];
-        const mightBeEligibleHashes: string[] = [];
-        exams.forEach(exam => {
-          const { eligible } = checkEligibility(userProfile, (exam as any).eligibilityBreakdown || (exam as any).eligibility || {});
-          if (eligible === true) eligibleHashes.push(exam.id);
-          else if (eligible === 'maybe') mightBeEligibleHashes.push(exam.id);
-        });
-        await updateUserProfile({ eligibleExams: eligibleHashes, mightBeEligibleExams: mightBeEligibleHashes });
-      // Force reload the dashboard
+      const mightBeEligibleHashes: string[] = [];
+
+      // Step 2: Run eligibility check against the REAL eligibility field in each exam
+      examsSnapshot.forEach(doc => {
+        const examData = doc.data();
+        const rawEligibility = examData.eligibility || {};
+        const { eligible } = checkEligibility(userProfile, rawEligibility);
+        const examId = examData.id || doc.id;
+        if (eligible === true) eligibleHashes.push(examId);
+        else if (eligible === 'maybe') mightBeEligibleHashes.push(examId);
+      });
+
+      // Step 3: Save fresh results to Firestore (overwrites old data)
+      await updateUserProfile({
+        eligibleExams: eligibleHashes,
+        mightBeEligibleExams: mightBeEligibleHashes
+      });
+
+      // Step 4: Reload so the UI picks up the new data
       window.location.reload();
     } catch (e) {
-      console.error(e);
+      console.error('Refresh failed:', e);
       window.location.reload();
     }
   };
